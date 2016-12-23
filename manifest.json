@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "name": "Next Bus",
+  "version": "0.0.1",
+
+  "description": "Helps you be in touch with your bus. Open source.",
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+
+  "browser_action": {
+    "default_icon": {
+      "16": "icons/16.png",
+      "24": "icons/24.png",
+      "32": "icons/32.png"
+    },
+    "default_title": "Next Bus",
+    "default_popup": "popup.html"
+  },
+
+  "author": "Nikolai Kapliev nkapliev@gmail.com",
+  "background": {
+    "scripts": ["js/get-next-bus.js"],
+    "persistent": false
+  },
+  "homepage_url": "https://github.com/nkapliev/next-bus",
+  "offline_enabled": false
+}
