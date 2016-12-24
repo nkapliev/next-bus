@@ -4,7 +4,9 @@ draw interface
 tests?
 icons
 README.md
-Yoman template for forking for other cities
+Contribute instructions for other cities
 about page
 options page https://developer.chrome.com/extensions/optionsV2
 demon script renew list with setTimeout(xhr)
+linter
+webpack for flexible moduling the app
