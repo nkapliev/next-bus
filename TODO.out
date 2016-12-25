@@ -1,4 +1,4 @@
-mvp
+* mvp
 api call abstraction for other cities
 draw interface
 tests?
@@ -10,3 +10,4 @@ options page https://developer.chrome.com/extensions/optionsV2
 demon script renew list with setTimeout(xhr)
 linter
 webpack for flexible moduling the app
+Licence

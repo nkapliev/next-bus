@@ -1,0 +1,25 @@
+{
+  "name": "next-bus",
+  "version": "1.0.0",
+  "description": "Chrome browser extension helps always be in touch with your next bus",
+  "main": "none",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nkapliev/next-bus.git"
+  },
+  "keywords": [
+    "browser",
+    "extension",
+    "chrome",
+    "bus"
+  ],
+  "author": "Nikolai Kapliev nkapliev@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nkapliev/next-bus/issues"
+  },
+  "homepage": "https://github.com/nkapliev/next-bus#readme",
+}
