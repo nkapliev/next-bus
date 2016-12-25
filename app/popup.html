@@ -69,11 +69,23 @@
         }
 
         .page {
-            width: 250px;
-            height: 100px;
+            min-width: 250px;
+            min-height: 100px;
+        }
+        .page__schedule {
+
+        }
+        .page__error {
+            color: firebrick;
+        }
+        .page__error_hidden_yes {
+            display: none;
+        }
+        .stop-input {
+
         }
 
-        .stop {
+        .stop-capture {
 
         }
         .next-bus {
@@ -89,7 +101,11 @@
     <script src="js/popup.js"></script>
 </head>
 <body>
-<div class="page"></div>
+<div class="page">
+    <input type="text" class="stop-input">
+    <div class="page__schedule"></div>
+    <div class="page__error"></div>
+</div>
 <div class="paranja">
     <div class="loader"></div>
 </div>

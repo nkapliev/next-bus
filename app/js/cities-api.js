@@ -23,13 +23,13 @@
 
 /**
  * @typedef {Object} Response - Argument for callback function in responseHandler
- *   @property {NextBus[]} nextBuses
+ *   @property {NextBusData[]} nextBuses
  */
 
 /**
- * @typedef {Object} NextBus
+ * @typedef {Object} NextBusData
  *   @property {String} routeId - Bus route name, ex.: '7A', '118', '777'
- *   @property {Number} departureTime - Minutes until next bus arrival
+ *   @property {String} departureTime - Minutes until next bus arrival
  */
 
 /**
