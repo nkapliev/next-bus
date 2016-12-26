@@ -1,0 +1,3 @@
+# Save this dir in git. TODO This dir should be created in build time. Need to fix build process.
+*
+!.gitignore
