@@ -1,6 +1,6 @@
 'use strict'
 
-import {makeAPIRequest} from './utils'
+import {makeAPIRequest} from './utils/background-utils'
 import {CITIES_API} from './cities-api'
 
 /**

@@ -38,22 +38,3 @@ export function makeAPIRequest (url, params, callback) {
     : err => console.log(`Network error: ${err}`)
   xhr.send()
 }
-
-/**
- * @param {Object} msg
- * @param {Function} [callback]
- * @param {Function} [errorCallback]
- */
-export function sendMessage (msg, callback, errorCallback) {
-  console.log(`Send message to next-bus script: ${JSON.stringify(msg)}`)
-
-  chrome.runtime.sendMessage(msg, null, response => { // TODO how to send only to particular script?
-    if (typeof response === 'undefined') {
-      console.log(`Error occurs while connecting to message receiver: ${JSON.stringify(chrome.runtime.lastError)}`)
-      errorCallback && errorCallback(chrome.runtime.lastError)
-    } else {
-      console.log(`Get response from background page: ${JSON.stringify(response)}`)
-      callback && callback(response)
-    }
-  })
-}
