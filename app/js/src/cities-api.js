@@ -46,7 +46,8 @@ export const CITIES_API = {
       const params = {}
 
       params.stopid = source.stopId
-      source.routeId && (params.routeid = source.routeId)
+      if (source.routeId)
+        params.routeid = source.routeId
 
       return params
     },

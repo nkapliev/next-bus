@@ -95,9 +95,10 @@ export function createElement (className, inner, tagName='div') {
  * @return {HTMLElement}
  */
 export function buildNextBusElement (nextBusData) {
-  let depTimeElem = createElement('next-bus__departure-time', nextBusData.departureTime)
-  let routeIdElem = createElement('next-bus__route-id', nextBusData.routeId)
   let nextBusElem = createElement('next-bus')
+  let routeIdElem = createElement('next-bus__route-id', nextBusData.routeId)
+  let depTimeElem = createElement('next-bus__departure-time',
+    nextBusData.departureTime ? `${nextBusData.departureTime} min` : 'due')
 
   nextBusElem.appendChild(routeIdElem)
   nextBusElem.appendChild(depTimeElem)
@@ -109,8 +110,9 @@ export function buildNextBusElement (nextBusData) {
  * @param {Object} msg
  * @param {Function} [callback]
  * @param {Function} [errorCallback]
+ * @param {Function} [alwaysCallback]
  */
-export function sendMessage (msg, callback, errorCallback) {
+export function sendMessage (msg, callback, errorCallback, alwaysCallback) {
   console.log(`Send message to next-bus script: ${JSON.stringify(msg)}`)
 
   chrome.runtime.sendMessage(msg, null, response => { // TODO how to send only to particular script?
@@ -121,5 +123,6 @@ export function sendMessage (msg, callback, errorCallback) {
       console.log(`Get response from background page: ${JSON.stringify(response)}`)
       callback && callback(response)
     }
+    alwaysCallback && alwaysCallback()
   })
 }

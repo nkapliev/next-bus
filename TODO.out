@@ -1,6 +1,6 @@
 * mvp
 * api call abstraction for other cities
-draw interface
+* draw interface
 beautify view
 tests?
 * icons
@@ -8,7 +8,8 @@ README.md
 Contribute instructions for other cities
 about page
 options page https://developer.chrome.com/extensions/optionsV2
-demon script renew list with setTimeout(xhr)
+demon script renew list with setTimeout(xhr) and renew extension icon so user don't have to open popup for checking the bus
 * linter and precommit checking
 * browserify + babelify + watchify + sourcemapify ... wtffy is going on with this -fy?
 Licence
+Promises

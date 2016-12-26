@@ -4,43 +4,66 @@ import {Block, buildNextBusElement, sendMessage} from './utils/popup-utils'
 
 // TODO debug mode console.log filter
 const CITY_ID = 'DUB' // TODO 1. get from select menu in interface and save to localstorage 2. Think about uniq ID
-const STOP_ID = '3163' // TODO get from input in interface and save to localstorage
+
+const PROJECT_REPO_URL = 'https://github.com/nkapliev/next-bus'
+const CHECK_API_INTERVAL = 60000 // 1 minute
+let checkApiIntervalId
+let lastApiCheckTs
+let stopId
 
 /**
- * @type {Block}
+ * Hash with main popup blocks
+ * @type {{String: Block}}
  */
-let pageScheduleBlock
+const pageBlocks = {}
 
 /**
- * @type {Block}
+ * @param {JSON} err
+ * @return {String}
  */
-let pageErrorBlock
+function getErrorMessage (err) {
+  let errorMessage
+
+  if (typeof err === 'string') {
+    errorMessage = err
+  } else if (err && err.message) {
+    errorMessage = err.message
+  } else {
+    errorMessage =
+      'Something bad just happened.<br>' +
+      `Please report here: <a target="_blank" href="${PROJECT_REPO_URL}/issues">next-bus/issues</a>`
+  }
+
+  return errorMessage
+}
 
 /**
  * @param {JSON} err
  */
 function errorHandler (err) {
-  err = JSON.stringify(err)
-  pageErrorBlock.htmlElem.innerHTML = `<pre>${err}</pre>`
-  pageErrorBlock.delMod('hidden', 'yes')
-  console.log(`popup errorHandler err: ${err}`)
+  pageBlocks.error.htmlElem.innerHTML = getErrorMessage(err)
+  pageBlocks.error.delMod('hidden', 'yes')
+  console.log(`popup errorHandler err: ${JSON.stringify(err)}`)
 }
 
 /**
  * @param {Response} response
  */
 function renewPopup (response) {
-  pageErrorBlock.setMod('hidden', 'yes')
-  pageScheduleBlock.htmlElem.innerHTML = '' // TODO Yes, it is slow. But there are not so many elements =)
+  pageBlocks.error.setMod('hidden', 'yes')
+  pageBlocks.schedule.htmlElem.innerHTML = '' // TODO Yes, it is slow. But there are not so many elements =)
   /** Much faster way:
   while (myNode.firstChild) {
     myNode.removeChild(myNode.firstChild);
   } */
 
+  // Remember las successful api check
+  localStorage.setItem('last-api-successful-check-ts', Date.now())
+
   response.nextBuses
     .sort((nextBusA, nextBusB) => nextBusA.departureTime - nextBusB.departureTime)
     .forEach(nextBusData => {
-      pageScheduleBlock.htmlElem.appendChild(buildNextBusElement(nextBusData))
+      pageBlocks.schedule.htmlElem.appendChild(buildNextBusElement(nextBusData))
     })
 }
 
@@ -48,16 +71,79 @@ function renewPopup (response) {
  * Send message to background script, which will initiate xhr API request for new data about next buses
  */
 function checkNextBus () {
+  pageBlocks.paranja.setMod('visible', 'yes')
+
   sendMessage(
-    {cmd: 'getNextBusInfo', cityId: CITY_ID, stopId: STOP_ID},
+    {cmd: 'getNextBusInfo', cityId: CITY_ID, stopId: stopId},
     renewPopup,
-    errorHandler
+    errorHandler,
+    _ => pageBlocks.paranja.delMod('visible', 'yes')
   )
 }
 
+/**
+ * Debounce stop-id-input
+ * @param {event} event
+ */
+const onStopIdChange = (_ => {
+  const DEBOUNCE_TTL = 1000 // 1 second
+  let debounceTimeoutId
+
+  return event => {
+    debounceTimeoutId && clearTimeout(debounceTimeoutId)
+    debounceTimeoutId = setTimeout(_ => {
+      debounceTimeoutId = null
+
+      // If value have been changed
+      if (stopId !== event.target.value) {
+        stopId = event.target.value
+        localStorage.setItem('stop-id', stopId)
+
+        console.log('Stop id input changed to: ', stopId)
+
+        // If user clear stop-id input -- erase clear the schedule
+        if (stopId === '') {
+          console.log('stop-id-input value === empty string')
+
+          pageBlocks.schedule.htmlElem.innerHTML = ''
+        // Otherwise restart api checking
+        } else {
+          clearInterval(checkApiIntervalId)
+          checkNextBus()
+          checkApiIntervalId = setInterval(checkNextBus, CHECK_API_INTERVAL)
+        }
+      }
+    }, DEBOUNCE_TTL)
+  }
+})()
+
 document.addEventListener('DOMContentLoaded', function () {
-  pageScheduleBlock = Block.findBlockInDocument('page__schedule')
-  pageErrorBlock = Block.findBlockInDocument('page__error')
-  checkNextBus()
-  setInterval(checkNextBus, 60000) // Check API every minute
+  // Find all necessary HTMLElements
+  pageBlocks.schedule = Block.findBlockInDocument('schedule')
+  pageBlocks.paranja = Block.findBlockInDocument('paranja')
+  pageBlocks.error = Block.findBlockInDocument('error')
+  pageBlocks.stopInput = Block.findBlockInDocument('stop-id-input')
+
+  // Listen stop-id value change event
+  pageBlocks.stopInput.htmlElem.addEventListener('input', onStopIdChange)
+
+  // Get stop id from localStorage
+  stopId = localStorage.getItem('stop-id')
+
+  // Get ts when we last time checked api
+  lastApiCheckTs = localStorage.getItem('last-api-successful-check-ts')
+
+  // If already have stopId
+  if (stopId) {
+    // Set stopId value to input
+    pageBlocks.stopInput.htmlElem.value = stopId
+
+    // If from last checking pass more then half of check interval -- check api immediately.
+    // TODO I do not kno why 30 sec. Have any idea for better value?
+    if (!lastApiCheckTs || lastApiCheckTs && lastApiCheckTs < (Date.now() - CHECK_API_INTERVAL / 2))
+      checkNextBus()
+
+    // Start checking API
+    checkApiIntervalId = setInterval(checkNextBus, CHECK_API_INTERVAL)
+  }
 })

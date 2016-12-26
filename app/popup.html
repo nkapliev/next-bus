@@ -5,17 +5,11 @@
     <style>
         body {
             font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-            font-size: 100%;
-        }
-        #status {
-            /* avoid an excessively wide status text */
-            white-space: pre;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            max-width: 400px;
+            font-size: 1em;
         }
 
         .paranja {
+            display: none;
             position: absolute;
             top: 0;
             bottom: 0;
@@ -23,24 +17,25 @@
             right: 0;
             background: rgba(0, 0, 0, 0.3);
         }
-        .paramja_hidden_yes {
-            display: none;
+        .paramja_visible_yes {
+            display: block;
         }
         .loader,
         .loader:after {
             border-radius: 50%;
-            width: 10em;
-            height: 10em;
+            width: 2em;
+            height: 2em;
         }
         .loader {
-            margin: 60px auto;
+            margin: -1em auto 0;
+            top: 50%;
             font-size: 10px;
             position: relative;
             text-indent: -9999em;
-            border-top: 1.1em solid rgba(248,255,250, 0.2);
-            border-right: 1.1em solid rgba(248,255,250, 0.2);
-            border-bottom: 1.1em solid rgba(248,255,250, 0.2);
-            border-left: 1.1em solid #f8fffa;
+            border-top: 0.5em solid rgba(248,255,250, 0.2);
+            border-right: 0.5em solid rgba(248,255,250, 0.2);
+            border-bottom: 0.5em solid rgba(248,255,250, 0.2);
+            border-left: 0.5em solid #f8fffa;
             -webkit-transform: translateZ(0);
             -ms-transform: translateZ(0);
             transform: translateZ(0);
@@ -69,42 +64,55 @@
         }
 
         .page {
-            min-width: 250px;
-            min-height: 100px;
-        }
-        .page__schedule {
 
         }
-        .page__error {
+        .schedule {
+            display: table;
+            white-space: nowrap;
+            margin-top: 10px;
+        }
+        .error {
             color: firebrick;
         }
-        .page__error_hidden_yes {
+        .error_hidden_yes {
             display: none;
         }
-        .stop-input {
 
+        .stop-id-wrapper {
+            width: 175px;
+        }
+        .stop-id-input {
+            font-size: 1em;
+            width: 70px;
+            box-sizing: border-box;
         }
 
         .stop-capture {
 
         }
         .next-bus {
-
+            display: table-row;
         }
         .next-bus__route-id {
-
+            display: table-cell;
+            text-align: right;
         }
         .next-bus__departure-time {
-
+            display: table-cell;
+            padding-left: 20px;
+            text-align: right;
         }
     </style>
     <script src="js/dist/popup.min.js"></script>
 </head>
 <body>
 <div class="page">
-    <input type="text" class="stop-input">
-    <div class="page__schedule"></div>
-    <div class="page__error"></div>
+    <div class="stop-id-wrapper">
+        <label for="stop-id" class="stop-label">Stop number</label>
+        <input id="stop-id" type="text" class="stop-id-input" placeholder="Enter stop number ..." autofocus>
+    </div>
+    <div class="schedule"></div>
+    <div class="error"></div>
 </div>
 <div class="paranja">
     <div class="loader"></div>
