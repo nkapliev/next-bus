@@ -37,7 +37,7 @@
  */
 export const CITIES_API = {
   /**
-   * @see https://data.gov.ie/dataset/real-time-passenger-information-rtpi-for-dublin-bus-bus-eireann-luas-and-irish-rail
+   * https://data.gov.ie/dataset/real-time-passenger-information-rtpi-for-dublin-bus-bus-eireann-luas-and-irish-rail
    */
   DUB: {
     iconsPrefix: 'dublin', // TODO should be also available in popup.js

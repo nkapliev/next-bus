@@ -1,13 +1,14 @@
 * mvp
-api call abstraction for other cities
+* api call abstraction for other cities
 draw interface
+beautify view
 tests?
-icons
+* icons
 README.md
 Contribute instructions for other cities
 about page
 options page https://developer.chrome.com/extensions/optionsV2
 demon script renew list with setTimeout(xhr)
-linter
-webpack for flexible moduling the app
+* linter and precommit checking
+* browserify + babelify + watchify + sourcemapify ... wtffy is going on with this -fy?
 Licence

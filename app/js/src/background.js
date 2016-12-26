@@ -1,7 +1,7 @@
 'use strict'
 
-import { makeAPIRequest } from './utils'
-import { CITIES_API } from './cities-api'
+import {makeAPIRequest} from './utils'
+import {CITIES_API} from './cities-api'
 
 /**
  * Hash with controllers
@@ -19,6 +19,5 @@ const CMDs = {
   }
 }
 
-chrome.runtime.onMessage.addListener(function(msg, _, sendResponse) {
-  return CMDs[msg.cmd](msg, sendResponse)
-})
+chrome.runtime.onMessage.addListener(
+  (msg, _, sendResponse) => CMDs[msg.cmd](msg, sendResponse))

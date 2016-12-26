@@ -1,0 +1,11 @@
+{
+  "parser": "babel-eslint",
+  "extends": "google",
+  "rules": {
+    "arrow-parens": [2, "as-needed"],
+    "comma-dangle": "off",
+    "semi": ["error", "never"],
+    "max-len": [2, {"code": 120}],
+    "space-before-function-paren": [2, "always"]
+  }
+}

@@ -1,10 +1,10 @@
 'use strict'
 
-import { sendMessage } from './utils'
+import {sendMessage} from './utils'
 
 // TODO debug mode console.log filter
 const CITY_ID = 'DUB' // TODO 1. get from select menu in interface and save to localstorage 2. Think about uniq ID
-const STOP_ID = '414' //TODO get from input in interface and save to localstorage
+const STOP_ID = '3163' // TODO get from input in interface and save to localstorage
 
 /**
  * @type {Block}
@@ -38,7 +38,7 @@ class Block {
   /**
    * @param {HTMLElement|HTMLDocument} htmlElemRoot
    * @param {String} className
-   * @returns {?Block}
+   * @return {?Block}
    */
   static findBlockIn (htmlElemRoot, className) {
     let htmlElem = htmlElemRoot.getElementsByClassName(className)[0]
@@ -47,7 +47,7 @@ class Block {
 
   /**
    * @param {String} className
-   * @returns {?Block}
+   * @return {?Block}
    */
   static findBlockInDocument (className) {
     return Block.findBlockIn(document.body, className)
@@ -56,7 +56,7 @@ class Block {
   /**
    * @param {HTMLElement|HTMLDocument} htmlElem
    * @param {String} className
-   * @returns {?Block}
+   * @return {?Block}
    */
   static findBlockOn (htmlElem, className) {
     return htmlElem.classList.contains(className) ? new Block(htmlElem) : null
@@ -81,17 +81,21 @@ class Block {
   /**
    * @param {String} modName
    * @param {String} modValue
-   * @returns {Boolean}
+   * @return {Boolean}
    */
   hasMod (modName, modValue) {
     return this.htmlElem.classList.contains(`${this.className}_${modName}_${modValue}`)
   }
 }
 
+/**
+ * @param {JSON} err
+ */
 function errorHandler (err) {
-  pageErrorBlock.htmlElem.innerHTML = `<pre>${JSON.stringify(err)}</pre>`
+  err = JSON.stringify(err)
+  pageErrorBlock.htmlElem.innerHTML = `<pre>${err}</pre>`
   pageErrorBlock.delMod('hidden', 'yes')
-  console.log(`popup errorHandler err: ${JSON.stringify(err)}`)
+  console.log(`popup errorHandler err: ${err}`)
 }
 
 /**
@@ -116,7 +120,7 @@ function renewPopup (response) {
  * @param {String} [className]
  * @param {String} [inner]
  * @param {String} [tagName='div']
- * @returns {HTMLElement}
+ * @return {HTMLElement}
  */
 function createElement (className, inner, tagName='div') {
   let elem = document.createElement(tagName)
@@ -131,7 +135,7 @@ function createElement (className, inner, tagName='div') {
 
 /**
  * @param {NextBusData} nextBusData
- * @returns {HTMLElement}
+ * @return {HTMLElement}
  */
 function buildNextBusElement (nextBusData) {
   let depTimeElem = createElement('next-bus__departure-time', nextBusData.departureTime)
@@ -144,6 +148,9 @@ function buildNextBusElement (nextBusData) {
   return nextBusElem
 }
 
+/**
+ * Send message to background script, which will initiate xhr API request for new data about next buses
+ */
 function checkNextBus () {
   sendMessage(
     {cmd: 'getNextBusInfo', cityId: CITY_ID, stopId: STOP_ID},

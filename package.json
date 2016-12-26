@@ -4,9 +4,13 @@
   "description": "Chrome browser extension helps always be in touch with your next bus",
   "main": "none",
   "scripts": {
+    "lint": "./node_modules/.bin/eslint app/js/src/",
     "build": "simplifyify app/js/src/popup.js app/js/src/background.js --outfile app/js/dist --bundle --minify --watch --debug",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nkapliev/next-bus.git"
@@ -24,11 +28,24 @@
   },
   "homepage": "https://github.com/nkapliev/next-bus#readme",
   "browserify": {
-    "transform": [["babelify", {"presets": ["env"]}]]
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "env"
+          ]
+        }
+      ]
+    ]
   },
   "devDependencies": {
+    "babel-eslint": "^6.1.2",
     "babelify": "^7.3.0",
     "browserify": "^13.1.1",
+    "eslint": "^3.12.2",
+    "eslint-config-google": "^0.7.1",
+    "pre-commit": "^1.2.2",
     "simplifyify": "^3.2.0"
   }
 }
