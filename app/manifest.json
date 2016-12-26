@@ -22,9 +22,12 @@
 
   "author": "Nikolai Kapliev nkapliev@gmail.com",
   "background": {
-    "scripts": ["js/dist/background.js"],
+    "scripts": ["js/dist/background.min.js"],
     "persistent": false
   },
   "homepage_url": "https://github.com/nkapliev/next-bus",
-  "offline_enabled": false
+  "offline_enabled": false,
+  "web_accessible_resources": [
+    "js/dist/*.map"
+  ]
 }

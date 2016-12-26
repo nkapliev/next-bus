@@ -4,9 +4,7 @@
   "description": "Chrome browser extension helps always be in touch with your next bus",
   "main": "none",
   "scripts": {
-    "build-popup": "browserify app/js/src/popup.js -o app/js/dist/popup.js -t [ babelify ]",
-    "build-background": "browserify app/js/src/background.js -o app/js/dist/background.js -t [ babelify ]",
-    "build": "npm run build-popup && npm run build-background",
+    "build": "simplifyify app/js/src/popup.js app/js/src/background.js --outfile app/js/dist --bundle --minify --watch --debug",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,8 +23,12 @@
     "url": "https://github.com/nkapliev/next-bus/issues"
   },
   "homepage": "https://github.com/nkapliev/next-bus#readme",
+  "browserify": {
+    "transform": [["babelify", {"presets": ["env"]}]]
+  },
   "devDependencies": {
     "babelify": "^7.3.0",
-    "browserify": "^13.1.1"
+    "browserify": "^13.1.1",
+    "simplifyify": "^3.2.0"
   }
 }
