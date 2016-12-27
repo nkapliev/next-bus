@@ -1,16 +1,23 @@
+DONE:
 * mvp
 * api call abstraction for other cities
 * draw interface
 * beautify view
-tests?
 * icons
-README.md
-Contribute instructions for other cities
-about page
-options page https://developer.chrome.com/extensions/optionsV2
-demon script renew list with setTimeout(xhr) and renew extension icon so user don't have to open popup for checking the bus
 * linter and precommit checking
 * browserify + babelify + watchify + sourcemapify ... wtffy is going on with this -fy?
-Licence
-Promises
 * Make errors from background page explicit
+
+TODO:
+move setInterval renew from popup to background script (demon script renew list with setTimeout(xhr) )
+add bus id input
+renew extension icon so user don't have to open popup for checking the bus
+about page
+README.md
+Contribute instructions for other cities
+Licence
+
+tests?
+
+options page https://developer.chrome.com/extensions/optionsV2
+Promises
