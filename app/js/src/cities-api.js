@@ -17,13 +17,16 @@
  *                                        with Response argument
  *   @param {Function} callback
  *     @param {Response}
- *   @param {Object} res
- *   @param {*} err
+ *   @param {?Object} [res]
+ *   @param {String} [err]
  */
 
 /**
  * @typedef {Object} Response - Argument for callback function in responseHandler
- *   @property {NextBusData[]} nextBuses
+ *   @property {Object} [error]
+ *     @property {String} [message]
+ *   @property {Object} [data]
+ *     @property {NextBusData[]} nextBuses
  */
 
 /**
@@ -53,16 +56,25 @@ export const CITIES_API = {
       return params
     },
     responseHandler: (callback, res, err) => {
+      let result = {}
+
       if (err) {
+        result.error = {message: err}
         console.log(`Error during API request: ${JSON.stringify(err)}`)
       } else if (!res) {
-        console.log(`Empty response: ${res}`)
+        result.error = {message: `Empty response from API: ${res}`}
+        console.log(result.error.message)
+      } else if (res.errorcode === '1') {
+        console.log('API found no buses')
+        result.data = {nextBuses: []}
       } else if (res.errorcode !== '0') {
-        console.log(`Error in API response. ${res.errorcode}: ${res.errormessage}`)
+        result.error = {message: `Error in API response. ${res.errorcode}: ${res.errormessage}`}
+        console.log(result.error.message)
       } else if (!Array.isArray(res.results)) {
-        console.log('Wrong API response format')
+        result.error = {message: 'Wrong format in API response'}
+        console.log(result.error.message)
       } else {
-        callback({
+        result.data = {
           nextBuses: res.results.map(item => {
             let leftMinutes = parseInt(item.departureduetime, 10) || 0
             return {
@@ -71,8 +83,10 @@ export const CITIES_API = {
               departureTime: (new Date(Date.now() + leftMinutes * 60 * 1000)).toLocaleTimeString().slice(0, -3)
             }
           })
-        })
+        }
       }
+
+      callback(result)
     }
   }
   /* @see type CityApiDriver

@@ -50,9 +50,19 @@
             position: relative;
         }
         .schedule {
+            margin-top: 10px;
+        }
+        .schedule__table {
             display: table;
             white-space: nowrap;
-            margin-top: 10px;
+        }
+        .schedule__message {
+            text-align: center;
+            color: darkgray;
+            display: none;
+        }
+        .schedule__message_visible_yes {
+            display: block;
         }
         .error {
             color: firebrick;
@@ -121,7 +131,10 @@
         <label for="stop-id" class="stop-label">Stop </label>
         <input id="stop-id" type="text" class="stop-id-input" placeholder="e.g. 172" autofocus>
     </div>
-    <div class="schedule"></div>
+    <div class="schedule">
+        <div class="schedule__table"></div>
+        <div class="schedule__message"></div>
+    </div>
     <div class="update-status">
         <div class="update-status__last-update">
             <div class="update-status__last-update-label">Last update</div>

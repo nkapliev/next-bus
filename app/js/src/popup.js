@@ -7,8 +7,12 @@ const CITY_ID = 'DUB' // TODO 1. get from select menu in interface and save to l
 
 const PROJECT_REPO_URL = 'https://github.com/nkapliev/next-bus'
 const CHECK_API_INTERVAL = 60000 // 1 minute
+const TEXTS = {
+  NO_BUSES: 'No bus shortly'
+}
 let checkApiIntervalId
 let lastApiCheckTs
+let isNewStopId
 let stopId
 
 /**
@@ -38,9 +42,17 @@ function getErrorMessage (err) {
 }
 
 /**
- * @param {JSON} err
+ * @param {Object} err
  */
 function errorHandler (err) {
+  // If user ask about new stop, then remove schedule
+  if (isNewStopId) {
+    pageBlocks.scheduleTable.htmlElem.innerHTML = ''
+    localStorage.setItem('schedule', '')
+
+    pageBlocks.lastUpdateTime.htmlElem.innerText = (new Date(Date.now())).toLocaleTimeString()
+  }
+
   pageBlocks.error.htmlElem.innerHTML = getErrorMessage(err)
   pageBlocks.error.delMod('hidden', 'yes')
   console.log(`popup errorHandler err: ${JSON.stringify(err)}`)
@@ -50,26 +62,36 @@ function errorHandler (err) {
  * @param {Response} response
  */
 function renewPopup (response) {
-  pageBlocks.error.setMod('hidden', 'yes')
-  pageBlocks.schedule.htmlElem.innerHTML = '' // TODO Yes, it is slow. But there are not so many elements =)
-  /** Much faster way:
-  while (myNode.firstChild) {
-    myNode.removeChild(myNode.firstChild);
-  } */
+  if (response.error) {
+    errorHandler(response.error)
+    return
+  }
 
-  // Remember last successful api check
+  isNewStopId && (isNewStopId = false)
+
+  // Hide error
+  pageBlocks.error.setMod('hidden', 'yes')
+  // Clear schedule
+  pageBlocks.scheduleTable.htmlElem.innerHTML = ''
+  // Save to localStorage successful api check ts
   lastApiCheckTs = Date.now()
   localStorage.setItem('last-api-successful-check-ts', lastApiCheckTs)
   pageBlocks.lastUpdateTime.htmlElem.innerText = (new Date(lastApiCheckTs)).toLocaleTimeString()
 
-  response.nextBuses
-    .sort((nextBusA, nextBusB) => nextBusA.leftMinutes - nextBusB.leftMinutes)
-    .forEach(nextBusData => {
-      pageBlocks.schedule.htmlElem.appendChild(buildNextBusElement(nextBusData))
-    })
+  if (response.data.nextBuses.length === 0) {
+    pageBlocks.scheduleMessage.htmlElem.innerText = TEXTS.NO_BUSES
+    pageBlocks.scheduleMessage.setMod('visible', 'yes')
+  } else {
+    pageBlocks.scheduleMessage.delMod('visible', 'yes')
+    response.data.nextBuses
+      .sort((nextBusA, nextBusB) => nextBusA.leftMinutes - nextBusB.leftMinutes)
+      .forEach(nextBusData => {
+        pageBlocks.scheduleTable.htmlElem.appendChild(buildNextBusElement(nextBusData))
+      })
+  }
 
   // Save new schedule to localStorage for being able to restore it after popup will be closed
-  localStorage.setItem('schedule', pageBlocks.schedule.htmlElem.innerHTML)
+  localStorage.setItem('schedule', pageBlocks.scheduleTable.htmlElem.innerHTML)
 }
 
 /**
@@ -112,9 +134,12 @@ const onStopIdChange = (_ => {
 
         // If user clear stop-id input -- erase clear the schedule
         if (stopId === '') {
-          pageBlocks.schedule.htmlElem.innerHTML = ''
+          pageBlocks.scheduleTable.htmlElem.innerHTML = ''
+          localStorage.setItem('schedule', '')
         // Otherwise restart api checking
         } else {
+          isNewStopId = true
+
           clearInterval(checkApiIntervalId)
           checkNextBus()
           checkApiIntervalId = setInterval(checkNextBus, CHECK_API_INTERVAL)
@@ -126,7 +151,8 @@ const onStopIdChange = (_ => {
 
 document.addEventListener('DOMContentLoaded', function () {
   // Find all necessary HTMLElements
-  pageBlocks.schedule = Block.findBlockInDocument('schedule')
+  pageBlocks.scheduleTable = Block.findBlockInDocument('schedule__table')
+  pageBlocks.scheduleMessage = Block.findBlockInDocument('schedule__message')
   pageBlocks.lastUpdate = Block.findBlockInDocument('update-status__last-update')
   pageBlocks.lastUpdateTime = Block.findBlockInDocument('update-status__last-update-time')
   pageBlocks.lastUpdateLabel = Block.findBlockInDocument('update-status__last-update-label')
@@ -158,7 +184,13 @@ document.addEventListener('DOMContentLoaded', function () {
       else {
         // Otherwise restore last saved schedule
         let scheduleHTML = localStorage.getItem('schedule')
-        scheduleHTML && (pageBlocks.schedule.htmlElem.innerHTML = scheduleHTML)
+        if (scheduleHTML) {
+          pageBlocks.scheduleTable.htmlElem.innerHTML = scheduleHTML
+        // If save exists but empty, show empty schedule text
+        } else if (scheduleHTML === '') {
+          pageBlocks.scheduleMessage.htmlElem.innerText = TEXTS.NO_BUSES
+          pageBlocks.scheduleMessage.setMod('visible', 'yes')
+        }
 
         // And refresh update block
         pageBlocks.updateStatusLoader.delMod('visible', 'yes')
@@ -170,5 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Start checking API
     checkApiIntervalId = setInterval(checkNextBus, CHECK_API_INTERVAL)
+  } else {
+    pageBlocks.updateStatusLoader.delMod('visible', 'yes')
   }
 })
