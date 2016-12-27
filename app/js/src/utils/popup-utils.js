@@ -27,7 +27,7 @@ export class Block {
    */
   static findBlockIn (htmlElemRoot, className) {
     let htmlElem = htmlElemRoot.getElementsByClassName(className)[0]
-    return htmlElem ? new Block(htmlElem) : null
+    return htmlElem ? new Block(htmlElem, className) : null
   }
 
   /**
@@ -97,10 +97,12 @@ export function createElement (className, inner, tagName='div') {
 export function buildNextBusElement (nextBusData) {
   let nextBusElem = createElement('next-bus')
   let routeIdElem = createElement('next-bus__route-id', nextBusData.routeId)
-  let depTimeElem = createElement('next-bus__departure-time',
-    nextBusData.departureTime ? `${nextBusData.departureTime} min` : 'due')
+  let leftMinutes = createElement('next-bus__left-minutes',
+    nextBusData.leftMinutes ? `${nextBusData.leftMinutes} min` : 'due')
+  let depTimeElem = createElement('next-bus__departure-time', nextBusData.departureTime)
 
   nextBusElem.appendChild(routeIdElem)
+  nextBusElem.appendChild(leftMinutes)
   nextBusElem.appendChild(depTimeElem)
 
   return nextBusElem

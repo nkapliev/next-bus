@@ -8,34 +8,17 @@
             font-size: 1em;
         }
 
-        .paranja {
-            display: none;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.3);
-        }
-        .paramja_visible_yes {
-            display: block;
-        }
         .loader,
         .loader:after {
             border-radius: 50%;
-            width: 2em;
-            height: 2em;
+            width: 1.2em;
+            height: 1.2em;
         }
         .loader {
-            margin: -1em auto 0;
-            top: 50%;
             font-size: 10px;
-            position: relative;
             text-indent: -9999em;
-            border-top: 0.5em solid rgba(248,255,250, 0.2);
-            border-right: 0.5em solid rgba(248,255,250, 0.2);
-            border-bottom: 0.5em solid rgba(248,255,250, 0.2);
-            border-left: 0.5em solid #f8fffa;
+            border: 0.3em solid rgba(255,219,76,1);
+            border-left-color: transparent;
             -webkit-transform: translateZ(0);
             -ms-transform: translateZ(0);
             transform: translateZ(0);
@@ -64,7 +47,7 @@
         }
 
         .page {
-
+            position: relative;
         }
         .schedule {
             display: table;
@@ -73,6 +56,7 @@
         }
         .error {
             color: firebrick;
+            font-size: 0.7em;
         }
         .error_hidden_yes {
             display: none;
@@ -87,9 +71,6 @@
             box-sizing: border-box;
         }
 
-        .stop-capture {
-
-        }
         .next-bus {
             display: table-row;
         }
@@ -97,10 +78,39 @@
             display: table-cell;
             text-align: right;
         }
+        .next-bus__left-minutes {
+            display: table-cell;
+            padding-left: 20px;
+            text-align: right;
+        }
         .next-bus__departure-time {
             display: table-cell;
             padding-left: 20px;
             text-align: right;
+        }
+
+        .update-status {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            text-align: center;
+            font-size: 0.7em;
+        }
+        .update-status__last-update {
+            display: none;
+        }
+        .update-status__last-update_visible_yes {
+            display: inline-block;
+        }
+        .update-status__loader {
+            position: absolute;
+            top: 5px;
+            right: 20px;
+
+            display: none;
+        }
+        .update-status__loader_visible_yes {
+            display: inline-block;
         }
     </style>
     <script src="js/dist/popup.min.js"></script>
@@ -108,14 +118,18 @@
 <body>
 <div class="page">
     <div class="stop-id-wrapper">
-        <label for="stop-id" class="stop-label">Stop number</label>
-        <input id="stop-id" type="text" class="stop-id-input" placeholder="Enter stop number ..." autofocus>
+        <label for="stop-id" class="stop-label">Stop </label>
+        <input id="stop-id" type="text" class="stop-id-input" placeholder="e.g. 172" autofocus>
     </div>
     <div class="schedule"></div>
+    <div class="update-status">
+        <div class="update-status__last-update">
+            <div class="update-status__last-update-label">Last update</div>
+            <div class="update-status__last-update-time"></div>
+        </div>
+        <div class="update-status__loader update-status__loader_visible_yes loader"></div>
+    </div>
     <div class="error"></div>
-</div>
-<div class="paranja">
-    <div class="loader"></div>
 </div>
 </body>
 </html>

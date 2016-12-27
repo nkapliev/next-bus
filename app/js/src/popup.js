@@ -57,27 +57,36 @@ function renewPopup (response) {
     myNode.removeChild(myNode.firstChild);
   } */
 
-  // Remember las successful api check
-  localStorage.setItem('last-api-successful-check-ts', Date.now())
+  // Remember last successful api check
+  lastApiCheckTs = Date.now()
+  localStorage.setItem('last-api-successful-check-ts', lastApiCheckTs)
+  pageBlocks.lastUpdateTime.htmlElem.innerText = (new Date(lastApiCheckTs)).toLocaleTimeString()
 
   response.nextBuses
-    .sort((nextBusA, nextBusB) => nextBusA.departureTime - nextBusB.departureTime)
+    .sort((nextBusA, nextBusB) => nextBusA.leftMinutes - nextBusB.leftMinutes)
     .forEach(nextBusData => {
       pageBlocks.schedule.htmlElem.appendChild(buildNextBusElement(nextBusData))
     })
+
+  // Save new schedule to localStorage for being able to restore it after popup will be closed
+  localStorage.setItem('schedule', pageBlocks.schedule.htmlElem.innerHTML)
 }
 
 /**
  * Send message to background script, which will initiate xhr API request for new data about next buses
  */
 function checkNextBus () {
-  pageBlocks.paranja.setMod('visible', 'yes')
+  pageBlocks.lastUpdate.delMod('visible', 'yes')
+  pageBlocks.updateStatusLoader.setMod('visible', 'yes')
 
   sendMessage(
     {cmd: 'getNextBusInfo', cityId: CITY_ID, stopId: stopId},
     renewPopup,
     errorHandler,
-    _ => pageBlocks.paranja.delMod('visible', 'yes')
+    _ => {
+      pageBlocks.updateStatusLoader.delMod('visible', 'yes')
+      pageBlocks.lastUpdate.setMod('visible', 'yes')
+    }
   )
 }
 
@@ -103,8 +112,6 @@ const onStopIdChange = (_ => {
 
         // If user clear stop-id input -- erase clear the schedule
         if (stopId === '') {
-          console.log('stop-id-input value === empty string')
-
           pageBlocks.schedule.htmlElem.innerHTML = ''
         // Otherwise restart api checking
         } else {
@@ -120,7 +127,10 @@ const onStopIdChange = (_ => {
 document.addEventListener('DOMContentLoaded', function () {
   // Find all necessary HTMLElements
   pageBlocks.schedule = Block.findBlockInDocument('schedule')
-  pageBlocks.paranja = Block.findBlockInDocument('paranja')
+  pageBlocks.lastUpdate = Block.findBlockInDocument('update-status__last-update')
+  pageBlocks.lastUpdateTime = Block.findBlockInDocument('update-status__last-update-time')
+  pageBlocks.lastUpdateLabel = Block.findBlockInDocument('update-status__last-update-label')
+  pageBlocks.updateStatusLoader = Block.findBlockInDocument('update-status__loader')
   pageBlocks.error = Block.findBlockInDocument('error')
   pageBlocks.stopInput = Block.findBlockInDocument('stop-id-input')
 
@@ -131,17 +141,32 @@ document.addEventListener('DOMContentLoaded', function () {
   stopId = localStorage.getItem('stop-id')
 
   // Get ts when we last time checked api
-  lastApiCheckTs = localStorage.getItem('last-api-successful-check-ts')
+  lastApiCheckTs = parseInt(localStorage.getItem('last-api-successful-check-ts'), 10)
 
   // If already have stopId
   if (stopId) {
     // Set stopId value to input
     pageBlocks.stopInput.htmlElem.value = stopId
 
-    // If from last checking pass more then half of check interval -- check api immediately.
-    // TODO I do not kno why 30 sec. Have any idea for better value?
-    if (!lastApiCheckTs || lastApiCheckTs && lastApiCheckTs < (Date.now() - CHECK_API_INTERVAL / 2))
+    if (lastApiCheckTs) {
+      pageBlocks.lastUpdateTime.htmlElem.innerText = (new Date(lastApiCheckTs)).toLocaleTimeString()
+
+      // If from last checking pass more then half of check interval -- check api immediately.
+      // TODO I do not kno why 30 sec. Have any idea for better value?
+      if (lastApiCheckTs < (Date.now() - CHECK_API_INTERVAL / 2))
+        checkNextBus()
+      else {
+        // Otherwise restore last saved schedule
+        let scheduleHTML = localStorage.getItem('schedule')
+        scheduleHTML && (pageBlocks.schedule.htmlElem.innerHTML = scheduleHTML)
+
+        // And refresh update block
+        pageBlocks.updateStatusLoader.delMod('visible', 'yes')
+        pageBlocks.lastUpdate.setMod('visible', 'yes')
+      }
+    } else {
       checkNextBus()
+    }
 
     // Start checking API
     checkApiIntervalId = setInterval(checkNextBus, CHECK_API_INTERVAL)

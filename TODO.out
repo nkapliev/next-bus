@@ -1,7 +1,7 @@
 * mvp
 * api call abstraction for other cities
 * draw interface
-beautify view
+* beautify view
 tests?
 * icons
 README.md
@@ -13,3 +13,4 @@ demon script renew list with setTimeout(xhr) and renew extension icon so user do
 * browserify + babelify + watchify + sourcemapify ... wtffy is going on with this -fy?
 Licence
 Promises
+Make errors from background page explicit

@@ -29,7 +29,8 @@
 /**
  * @typedef {Object} NextBusData
  *   @property {String} routeId - Bus route name, ex.: '7A', '118', '777'
- *   @property {String} departureTime - Minutes until next bus arrival
+ *   @property {Number} leftMinutes - Minutes until next bus arrival
+ *   @property {String} departureTime - Departure time string e.g. 'HH:MM'
  */
 
 /**
@@ -63,9 +64,11 @@ export const CITIES_API = {
       } else {
         callback({
           nextBuses: res.results.map(item => {
+            let leftMinutes = parseInt(item.departureduetime, 10) || 0
             return {
               routeId: item.route,
-              departureTime: parseInt(item.departureduetime, 10)
+              leftMinutes: leftMinutes,
+              departureTime: (new Date(Date.now() + leftMinutes * 60 * 1000)).toLocaleTimeString().slice(0, -3)
             }
           })
         })
