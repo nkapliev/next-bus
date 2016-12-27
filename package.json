@@ -1,8 +1,8 @@
 {
   "name": "next-bus",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Chrome browser extension helps always be in touch with your next bus",
-  "main": "none",
+  "main": "app/js/dist/popup.js",
   "scripts": {
     "lint": "./node_modules/.bin/eslint app/js/src/",
     "build": "simplifyify app/js/src/popup.js app/js/src/background.js --outfile app/js/dist --bundle --minify --watch --debug",
@@ -21,8 +21,8 @@
     "chrome",
     "bus"
   ],
-  "author": "Nikolai Kapliev nkapliev@gmail.com",
-  "license": "ISC",
+  "author": "Nikolai Kapliev <nkapliev@gmail.com>",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/nkapliev/next-bus/issues"
   },
