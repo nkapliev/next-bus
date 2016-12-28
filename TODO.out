@@ -9,6 +9,7 @@ DONE:
 * Make errors from background page explicit
 
 TODO:
+`due in`
 move setInterval renew from popup to background script (demon script renew list with setTimeout(xhr) )
 add bus id input
 renew extension icon so user don't have to open popup for checking the bus
