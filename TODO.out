@@ -7,10 +7,14 @@ DONE:
 * linter and precommit checking
 * browserify + babelify + watchify + sourcemapify ... wtffy is going on with this -fy?
 * Make errors from background page explicit
+* move setInterval renew from popup to background script (demon script renew list with setTimeout(xhr) )
+* Promises
+* jsdoc
+
 
 TODO:
 `due in`
-move setInterval renew from popup to background script (demon script renew list with setTimeout(xhr) )
+badge
 add bus id input
 renew extension icon so user don't have to open popup for checking the bus
 about page
@@ -21,4 +25,8 @@ Licence
 tests?
 
 options page https://developer.chrome.com/extensions/optionsV2
-Promises
+Google Analytics counter
+
+
+Long term TODO:
+Add ability to add stops from map

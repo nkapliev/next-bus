@@ -1,208 +1,198 @@
 'use strict'
-
-import {Block, buildNextBusElement, sendMessage} from './utils/popup-utils'
-
 // TODO debug mode console.log filter
-const CITY_ID = 'DUB' // TODO 1. get from select menu in interface and save to localstorage 2. Think about uniq ID
 
-const PROJECT_REPO_URL = 'https://github.com/nkapliev/next-bus'
-const CHECK_API_INTERVAL = 60000 // 1 minute
-const TEXTS = {
-  NO_BUSES: 'No bus shortly'
-}
-let checkApiIntervalId
-let lastApiCheckTs
-let isNewStopId
-let stopId
+import {config} from './config'
+import {Block} from './utils/Block'
+import {send} from './utils/post-message'
+
+const sendToBackground = send.bind(null, 'popup', 'background')
+const i18n = config.i18n.en
+let backgroundPort = null
+let stopId = null
 
 /**
- * Hash with main popup blocks
+ * Hash with popup blocks
  * @type {{String: Block}}
  */
-const pageBlocks = {}
+const blocks = {}
 
 /**
- * @param {JSON} err
- * @return {String}
+ * @param {String} [className]
+ * @param {String} [inner]
+ * @param {String} [tagName='div']
+ * @return {HTMLElement}
  */
-function getErrorMessage (err) {
-  let errorMessage
+function createElement (className, inner, tagName='div') {
+  let elem = document.createElement(tagName)
 
-  if (typeof err === 'string') {
-    errorMessage = err
-  } else if (err && err.message) {
-    errorMessage = err.message
-  } else {
-    errorMessage =
-      'Something bad just happened.<br>' +
-      `Please report here: <a target="_blank" href="${PROJECT_REPO_URL}/issues">next-bus/issues</a>`
-  }
+  if (typeof className !== 'undefined')
+    elem.className = className
+  if (typeof inner !== 'undefined')
+    elem.innerHTML = inner
 
-  return errorMessage
+  return elem
 }
 
 /**
- * @param {Object} err
+ * @param {NextBusData} nextBusData
+ * @return {HTMLElement}
  */
-function errorHandler (err) {
-  // If user ask about new stop, then remove schedule
-  if (isNewStopId) {
-    pageBlocks.scheduleTable.htmlElem.innerHTML = ''
-    localStorage.setItem('schedule', '')
+function buildNextBusElement (nextBusData) {
+  let nextBusElem = createElement('next-bus')
+  let routeIdElem = createElement('next-bus__route-id', nextBusData.routeId)
+  let leftMinutes = createElement('next-bus__left-minutes',
+    nextBusData.leftMinutes ? `${nextBusData.leftMinutes} min` : 'due')
+  let depTimeElem = createElement('next-bus__departure-time', nextBusData.departureTime)
 
-    pageBlocks.lastUpdateTime.htmlElem.innerText = (new Date(Date.now())).toLocaleTimeString()
-  }
+  nextBusElem.appendChild(routeIdElem)
+  nextBusElem.appendChild(leftMinutes)
+  nextBusElem.appendChild(depTimeElem)
 
-  pageBlocks.error.htmlElem.innerHTML = getErrorMessage(err)
-  pageBlocks.error.delMod('hidden', 'yes')
-  console.log(`popup errorHandler err: ${JSON.stringify(err)}`)
-}
-
-/**
- * @param {Response} response
- */
-function renewPopup (response) {
-  if (response.error) {
-    errorHandler(response.error)
-    return
-  }
-
-  isNewStopId && (isNewStopId = false)
-
-  // Hide error
-  pageBlocks.error.setMod('hidden', 'yes')
-  // Clear schedule
-  pageBlocks.scheduleTable.htmlElem.innerHTML = ''
-  // Save to localStorage successful api check ts
-  lastApiCheckTs = Date.now()
-  localStorage.setItem('last-api-successful-check-ts', lastApiCheckTs)
-  pageBlocks.lastUpdateTime.htmlElem.innerText = (new Date(lastApiCheckTs)).toLocaleTimeString()
-
-  if (response.data.nextBuses.length === 0) {
-    pageBlocks.scheduleMessage.htmlElem.innerText = TEXTS.NO_BUSES
-    pageBlocks.scheduleMessage.setMod('visible', 'yes')
-  } else {
-    pageBlocks.scheduleMessage.delMod('visible', 'yes')
-    response.data.nextBuses
-      .sort((nextBusA, nextBusB) => nextBusA.leftMinutes - nextBusB.leftMinutes)
-      .forEach(nextBusData => {
-        pageBlocks.scheduleTable.htmlElem.appendChild(buildNextBusElement(nextBusData))
-      })
-  }
-
-  // Save new schedule to localStorage for being able to restore it after popup will be closed
-  localStorage.setItem('schedule', pageBlocks.scheduleTable.htmlElem.innerHTML)
-}
-
-/**
- * Send message to background script, which will initiate xhr API request for new data about next buses
- */
-function checkNextBus () {
-  pageBlocks.lastUpdate.delMod('visible', 'yes')
-  pageBlocks.updateStatusLoader.setMod('visible', 'yes')
-
-  sendMessage(
-    {cmd: 'getNextBusInfo', cityId: CITY_ID, stopId: stopId},
-    renewPopup,
-    errorHandler,
-    _ => {
-      pageBlocks.updateStatusLoader.delMod('visible', 'yes')
-      pageBlocks.lastUpdate.setMod('visible', 'yes')
-    }
-  )
+  return nextBusElem
 }
 
 /**
  * Debounce stop-id-input
  * @param {event} event
  */
-const onStopIdChange = (_ => {
-  const DEBOUNCE_TTL = 1000 // 1 second
+const onStopIdChange = (() => {
   let debounceTimeoutId
+  const stopIdChangeHandler = event => {
+    if (stopId !== event.target.value) {
+      stopId = event.target.value
+      console.log('Stop id input changed to: ', stopId)
+      blocks.updateStatusLoader.setMod('visible', 'yes')
+      sendToBackground('setState', {stopId}, backgroundPort)
+    }
+  }
 
   return event => {
-    debounceTimeoutId && clearTimeout(debounceTimeoutId)
-    debounceTimeoutId = setTimeout(_ => {
-      debounceTimeoutId = null
-
-      // If value have been changed
-      if (stopId !== event.target.value) {
-        stopId = event.target.value
-        localStorage.setItem('stop-id', stopId)
-
-        console.log('Stop id input changed to: ', stopId)
-
-        // If user clear stop-id input -- erase clear the schedule
-        if (stopId === '') {
-          pageBlocks.scheduleTable.htmlElem.innerHTML = ''
-          localStorage.setItem('schedule', '')
-        // Otherwise restart api checking
-        } else {
-          isNewStopId = true
-
-          clearInterval(checkApiIntervalId)
-          checkNextBus()
-          checkApiIntervalId = setInterval(checkNextBus, CHECK_API_INTERVAL)
-        }
-      }
-    }, DEBOUNCE_TTL)
+    if (!event.target.value) {
+      stopIdChangeHandler(event)
+    } else {
+      debounceTimeoutId && clearTimeout(debounceTimeoutId)
+      debounceTimeoutId = setTimeout(() => {
+        debounceTimeoutId = null
+        stopIdChangeHandler(event)
+      }, config.inputDebounceTTL)
+    }
   }
 })()
 
-document.addEventListener('DOMContentLoaded', function () {
-  // Find all necessary HTMLElements
-  pageBlocks.scheduleTable = Block.findBlockInDocument('schedule__table')
-  pageBlocks.scheduleMessage = Block.findBlockInDocument('schedule__message')
-  pageBlocks.lastUpdate = Block.findBlockInDocument('update-status__last-update')
-  pageBlocks.lastUpdateTime = Block.findBlockInDocument('update-status__last-update-time')
-  pageBlocks.lastUpdateLabel = Block.findBlockInDocument('update-status__last-update-label')
-  pageBlocks.updateStatusLoader = Block.findBlockInDocument('update-status__loader')
-  pageBlocks.error = Block.findBlockInDocument('error')
-  pageBlocks.stopInput = Block.findBlockInDocument('stop-id-input')
+/**
+ * Establish permanent connection to constantly worked background script
+ */
+function connectToBackground () {
+  if (backgroundPort) {
+    backgroundPort.disconnect()
+  }
 
-  // Listen stop-id value change event
-  pageBlocks.stopInput.htmlElem.addEventListener('input', onStopIdChange)
+  backgroundPort = chrome.runtime.connect({name: 'background'})
+  backgroundPort.onMessage.addListener(message => {
+    let callback = callbacks[message.cmd]
 
-  // Get stop id from localStorage
-  stopId = localStorage.getItem('stop-id')
+    console.log(`Popup get a message: ${JSON.stringify(message)}`)
 
-  // Get ts when we last time checked api
-  lastApiCheckTs = parseInt(localStorage.getItem('last-api-successful-check-ts'), 10)
-
-  // If already have stopId
-  if (stopId) {
-    // Set stopId value to input
-    pageBlocks.stopInput.htmlElem.value = stopId
-
-    if (lastApiCheckTs) {
-      pageBlocks.lastUpdateTime.htmlElem.innerText = (new Date(lastApiCheckTs)).toLocaleTimeString()
-
-      // If from last checking pass more then half of check interval -- check api immediately.
-      // TODO I do not kno why 30 sec. Have any idea for better value?
-      if (lastApiCheckTs < (Date.now() - CHECK_API_INTERVAL / 2))
-        checkNextBus()
-      else {
-        // Otherwise restore last saved schedule
-        let scheduleHTML = localStorage.getItem('schedule')
-        if (scheduleHTML) {
-          pageBlocks.scheduleTable.htmlElem.innerHTML = scheduleHTML
-        // If save exists but empty, show empty schedule text
-        } else if (scheduleHTML === '') {
-          pageBlocks.scheduleMessage.htmlElem.innerText = TEXTS.NO_BUSES
-          pageBlocks.scheduleMessage.setMod('visible', 'yes')
-        }
-
-        // And refresh update block
-        pageBlocks.updateStatusLoader.delMod('visible', 'yes')
-        pageBlocks.lastUpdate.setMod('visible', 'yes')
-      }
-    } else {
-      checkNextBus()
+    if (typeof callback !== 'function') {
+      console.log(`Popup has no callback for cmd '${message.cmd}'`)
+      return
     }
 
-    // Start checking API
-    checkApiIntervalId = setInterval(checkNextBus, CHECK_API_INTERVAL)
-  } else {
-    pageBlocks.updateStatusLoader.delMod('visible', 'yes')
+    callback(message.data)
+  })
+}
+
+/**
+ * Restore last state
+ */
+function restoreState () {
+  sendToBackground('getStop', null, backgroundPort)
+  sendToBackground('getLastAPICallTs', null, backgroundPort)
+  sendToBackground('updateData', null, backgroundPort)
+}
+
+/**
+ * Hash with callbacks for background requests
+ */
+const callbacks = {
+  /**
+   * @param {APIHandledData} data
+   */
+  updateDataCallback: data => {
+    blocks.updateStatusLoader.delMod('visible', 'yes')
+
+    if (data && data.error) {
+      blocks.error.delMod('hidden', 'yes')
+      console.log(`Popup get an error in updateDataCallback: ${JSON.stringify(data.error)}`)
+      return
+    }
+
+    blocks.error.setMod('hidden', 'yes')
+    blocks.scheduleTable.htmlElem.innerHTML = ''
+
+    if (!data || !Array.isArray(data.nextBuses)) {
+      if (stopId) {
+        blocks.scheduleMessage.htmlElem.innerText = i18n.no_info
+        blocks.scheduleMessage.setMod('visible', 'yes')
+      } else {
+        blocks.scheduleMessage.delMod('visible', 'yes')
+      }
+    } else if (data.nextBuses.length === 0) {
+      blocks.scheduleMessage.htmlElem.innerText = i18n.no_buses
+      blocks.scheduleMessage.setMod('visible', 'yes')
+    } else {
+      blocks.scheduleMessage.delMod('visible', 'yes')
+      data.nextBuses
+        .sort((busA, busB) => busA.leftMinutes - busB.leftMinutes)
+        .forEach(bus => blocks.scheduleTable.htmlElem.appendChild(buildNextBusElement(bus)))
+    }
+  },
+  /**
+   * @param {?String} initStopId
+   */
+  getStopCallback: initStopId => {
+    stopId = initStopId
+
+    if (stopId) {
+      blocks.stopInput.htmlElem.value = stopId
+    }
+  },
+  /**
+   * @param {?Number} lastAPICallTs
+   */
+  getLastAPICallTsCallback: lastAPICallTs => {
+    if (lastAPICallTs) {
+      blocks.lastUpdateTime.htmlElem.innerText = (new Date(lastAPICallTs)).toLocaleTimeString()
+    }
   }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Find all necessary HTMLElements
+  [
+    {name: 'lastUpdateLabel', cssClass: 'update-status__last-update-label'},
+    {name: 'lastUpdateTime', cssClass: 'update-status__last-update-time'},
+    {name: 'updateStatusLoader', cssClass: 'update-status__loader'},
+    {name: 'lastUpdate', cssClass: 'update-status__last-update'},
+    {name: 'scheduleMessage', cssClass: 'schedule__message'},
+    {name: 'scheduleTable', cssClass: 'schedule__table'},
+    {name: 'pageLoader', cssClass: 'page__loader'},
+    {name: 'stopInput', cssClass: 'stop-id-input'},
+    {name: 'error', cssClass: 'error'},
+    {name: 'page', cssClass: 'page'},
+  ].forEach(block => {
+    blocks[block.name] = Block.findBlockInDocument(block.cssClass)
+  })
+
+  connectToBackground()
+  restoreState()
+
+  // Listen stop-id value change event
+  blocks.stopInput.htmlElem.addEventListener('input', onStopIdChange)
+
+  // For some reason sometimes popup opens only as small square.
+  setTimeout(() => {
+    blocks.pageLoader.delMod('visible', 'yes')
+    blocks.page.setMod('visible', 'yes')
+  }, config.popupShowTimeout)
 })
