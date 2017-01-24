@@ -48,6 +48,16 @@
 
         .page {
             position: relative;
+            display: none;
+        }
+        .page_visible_yes {
+            display: block;
+        }
+        .page__loader {
+            display: none;
+        }
+        .page__loader_visible_yes {
+            display: inline-block;
         }
         .schedule {
             margin-top: 10px;
@@ -115,7 +125,7 @@
         .update-status__loader {
             position: absolute;
             top: 5px;
-            right: 20px;
+            right: 8px;
 
             display: none;
         }
@@ -128,8 +138,8 @@
 <body>
 <div class="page">
     <div class="stop-id-wrapper">
-        <label for="stop-id" class="stop-label">Stop </label>
-        <input id="stop-id" type="text" class="stop-id-input" placeholder="e.g. 172" autofocus>
+        <label for="stop-id" class="stop-label">Stop No.</label>
+        <input id="stop-id" type="text" class="stop-id-input" placeholder="e.g. 273" autofocus>
     </div>
     <div class="schedule">
         <div class="schedule__table"></div>
@@ -142,8 +152,12 @@
         </div>
         <div class="update-status__loader update-status__loader_visible_yes loader"></div>
     </div>
-    <div class="error"></div>
+    <div class="error">
+        An error happened<br>
+        If you know how to debug code, please create an issue in the <a href="https://github.com/nkapliev/next-bus/issues">repository</a>
+    </div>
 </div>
+<div class="page__loader page__loader_visible_yes loader"></div>
 </body>
 </html>
 
