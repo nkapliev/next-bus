@@ -8,7 +8,7 @@ import {send} from './utils/post-message'
 const sendToBackground = send.bind(null, 'popup', 'background')
 const i18n = config.i18n.en
 let backgroundPort = null
-let stopId = null
+let state = {}
 
 /**
  * Hash with popup blocks
@@ -52,32 +52,34 @@ function buildNextBusElement (nextBusData) {
 }
 
 /**
- * Debounce stop-id-input
- * @param {event} event
+ * @param {String} stateName
+ * @return {Function}
  */
-const onStopIdChange = (() => {
+function getInputDebouncedHandler (stateName) {
   let debounceTimeoutId
-  const stopIdChangeHandler = event => {
-    if (stopId !== event.target.value) {
-      stopId = event.target.value
-      console.log('Stop id input changed to: ', stopId)
+  const handler = event => {
+    if (state[stateName] !== event.target.value) {
+      state[stateName] = event.target.value
+
+      console.log(`${stateName} input changed to: ${state[stateName]}`)
+
       blocks.updateStatusLoader.setMod('visible', 'yes')
-      sendToBackground('setState', {stopId}, backgroundPort)
+      sendToBackground('setState', {[stateName]: state[stateName]}, backgroundPort)
     }
   }
 
   return event => {
     if (!event.target.value) {
-      stopIdChangeHandler(event)
+      handler(event)
     } else {
       debounceTimeoutId && clearTimeout(debounceTimeoutId)
       debounceTimeoutId = setTimeout(() => {
         debounceTimeoutId = null
-        stopIdChangeHandler(event)
+        handler(event)
       }, config.inputDebounceTTL)
     }
   }
-})()
+}
 
 /**
  * Establish permanent connection to constantly worked background script
@@ -107,6 +109,7 @@ function connectToBackground () {
  */
 function restoreState () {
   sendToBackground('getStop', null, backgroundPort)
+  sendToBackground('getRoute', null, backgroundPort)
   sendToBackground('getLastAPICallTs', null, backgroundPort)
   sendToBackground('updateData', null, backgroundPort)
 }
@@ -131,7 +134,7 @@ const callbacks = {
     blocks.scheduleTable.htmlElem.innerHTML = ''
 
     if (!data || !Array.isArray(data.nextBuses)) {
-      if (stopId) {
+      if (state.stopId) {
         blocks.scheduleMessage.htmlElem.innerText = i18n.no_info
         blocks.scheduleMessage.setMod('visible', 'yes')
       } else {
@@ -151,10 +154,20 @@ const callbacks = {
    * @param {?String} initStopId
    */
   getStopCallback: initStopId => {
-    stopId = initStopId
+    state.stopId = initStopId
 
-    if (stopId) {
-      blocks.stopInput.htmlElem.value = stopId
+    if (state.stopId) {
+      blocks.stopInput.htmlElem.value = state.stopId
+    }
+  },
+  /**
+   * @param {?String} initRouteId
+   */
+  getRouteCallback: initRouteId => {
+    state.routeId = initRouteId
+
+    if (state.routeId) {
+      blocks.routeInput.htmlElem.value = state.routeId
     }
   },
   /**
@@ -177,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
     {name: 'scheduleMessage', cssClass: 'schedule__message'},
     {name: 'scheduleTable', cssClass: 'schedule__table'},
     {name: 'pageLoader', cssClass: 'page__loader'},
+    {name: 'routeInput', cssClass: 'route-id-input'},
     {name: 'stopInput', cssClass: 'stop-id-input'},
     {name: 'error', cssClass: 'error'},
     {name: 'page', cssClass: 'page'},
@@ -187,8 +201,8 @@ document.addEventListener('DOMContentLoaded', function () {
   connectToBackground()
   restoreState()
 
-  // Listen stop-id value change event
-  blocks.stopInput.htmlElem.addEventListener('input', onStopIdChange)
+  blocks.stopInput.htmlElem.addEventListener('input', getInputDebouncedHandler('stopId'))
+  blocks.routeInput.htmlElem.addEventListener('input', getInputDebouncedHandler('routeId'))
 
   // For some reason sometimes popup opens only as small square.
   setTimeout(() => {

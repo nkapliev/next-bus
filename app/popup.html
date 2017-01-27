@@ -85,7 +85,20 @@
         .stop-id-wrapper {
             width: 175px;
         }
+        .stop-label {
+            margin-right: 7px;
+        }
         .stop-id-input {
+            font-size: 1em;
+            width: 70px;
+            box-sizing: border-box;
+        }
+
+        .route-id-wrapper {
+            width: 175px;
+            margin-top: 3px;
+        }
+        .route-id-input {
             font-size: 1em;
             width: 70px;
             box-sizing: border-box;
@@ -138,8 +151,12 @@
 <body>
 <div class="page">
     <div class="stop-id-wrapper">
-        <label for="stop-id" class="stop-label">Stop No.</label>
+        <label for="stop-id" class="stop-label">stop </label>
         <input id="stop-id" type="text" class="stop-id-input" placeholder="e.g. 273" autofocus>
+    </div>
+    <div class="route-id-wrapper">
+        <label for="route-id" class="route-label">route </label>
+        <input id="route-id" type="text" class="route-id-input" placeholder="e.g. 7A" autofocus>
     </div>
     <div class="schedule">
         <div class="schedule__table"></div>
