@@ -6,6 +6,7 @@ import {config} from './config'
 import {send} from './utils/post-message'
 
 const sendToPopup = send.bind(null, 'background', 'popup')
+const i18n = config.i18n.en
 const colors = config.colors
 const state = {
   // TODO 1. get cityId from select menu in interface and save to localstorage 2. Think about uniq ID
@@ -16,7 +17,7 @@ const state = {
 
 let isStateSync = false
 let lastStateSyncTs
-let nextBusesFromLastAPICheck
+let nextBusesDataFromLastAPICheck
 let api = CITIES_API[state.cityId]
 let dataUpdateIntervalId
 let popupPort = null
@@ -47,7 +48,7 @@ const handlers = {
       return makeAPIRequest(api.url, params)
         .then(api.responseHandler)
     } else {
-      return Promise.resolve(nextBusesFromLastAPICheck)
+      return Promise.resolve(nextBusesDataFromLastAPICheck)
     }
   },
   /**
@@ -56,20 +57,20 @@ const handlers = {
   updateData: (() => {
     const intervalCallback = () => {
       handlers.getNextBuses()
-        .then(nextBuses => {
+        .then(nextBusesData => {
           isStateSync = true
           lastStateSyncTs = Date.now()
-          nextBusesFromLastAPICheck = nextBuses
+          nextBusesDataFromLastAPICheck = nextBusesData
 
-          if (Array.isArray(nextBuses) && nextBuses.length) {
-            handlers.updateBadge(null, nextBuses[0].leftMinutes)
+          if (Array.isArray(nextBusesData.nextBuses) && nextBusesData.nextBuses.length) {
+            handlers.updateBadge(nextBusesData.nextBuses[0].leftMinutes)
           } else {
             // Not data? Clear the badge!
             handlers.updateBadge()
           }
 
           return Promise.all([
-            sendToPopup('updateDataCallback', nextBuses, popupPort),
+            sendToPopup('updateDataCallback', nextBusesData, popupPort),
             sendToPopup('getLastAPICallTsCallback', lastStateSyncTs, popupPort)
           ])
         })
@@ -99,22 +100,17 @@ const handlers = {
   })(),
   /**
    * With no params will clear the badge
-   * @param {*} [err]
-   * @param {Number} [minutes]
+   * @param {String|Number} [minutes]
    */
-  updateBadge: (err, minutes) => {
-    let text
-    let color
+  updateBadge: minutes => {
+    let text = ''
+    let color = colors.empty
 
-    if (err) {
-      text = 'err'  // TODO replace 'err' with icon?
-      color = colors.error
-    } else if (typeof minutes === 'number') {
-      text = String(minutes)
+    minutes = parseInt(minutes, 10)
+
+    if (Number.isInteger(minutes)) {
+      text = minutes === 0 ? i18n.due : String(minutes)
       color = minutes <= config.alarmStartTime ? colors.alarm : colors.ok
-    } else {
-      text = ''
-      color = colors.empty
     }
 
     chrome.browserAction.setBadgeText({text})

@@ -10,13 +10,11 @@ DONE:
 * move setInterval renew from popup to background script (demon script renew list with setTimeout(xhr) )
 * Promises
 * jsdoc
+renew extension icon so user don't have to open popup for checking the bus (badge)
 
 
 TODO:
-`due in`
-badge
 add bus id input
-renew extension icon so user don't have to open popup for checking the bus
 about page
 README.md
 Contribute instructions for other cities

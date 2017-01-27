@@ -14,7 +14,8 @@ export let config = {
   i18n: {
     en: {
       no_buses: 'No bus shortly',
-      no_info: 'No info about stop'
+      no_info: 'No info about stop',
+      due: 'due'
     }
   },
   repo: 'https://github.com/nkapliev/next-bus'
