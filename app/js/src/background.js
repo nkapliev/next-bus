@@ -17,7 +17,7 @@ const state = {
 
 let isStateSync = false
 let lastStateSyncTs
-let nextBusesDataFromLastAPICheck
+let lastAPICheckData
 let api = CITIES_API[state.cityId]
 let dataUpdateIntervalId
 let popupPort = null
@@ -48,7 +48,7 @@ const handlers = {
       return makeAPIRequest(api.url, params)
         .then(api.responseHandler)
     } else {
-      return Promise.resolve(nextBusesDataFromLastAPICheck)
+      return Promise.resolve(lastAPICheckData)
     }
   },
   /**
@@ -57,20 +57,20 @@ const handlers = {
   updateData: (() => {
     const intervalCallback = () => {
       handlers.getNextBuses()
-        .then(nextBusesData => {
+        .then(data => {
           isStateSync = true
           lastStateSyncTs = Date.now()
-          nextBusesDataFromLastAPICheck = nextBusesData
+          lastAPICheckData = data
 
-          if (Array.isArray(nextBusesData.nextBuses) && nextBusesData.nextBuses.length) {
-            handlers.updateBadge(nextBusesData.nextBuses[0].leftMinutes)
+          if (data && Array.isArray(data.nextBuses) && data.nextBuses.length) {
+            handlers.updateBadge(data.nextBuses[0].leftMinutes)
           } else {
             // Not data? Clear the badge!
             handlers.updateBadge()
           }
 
           return Promise.all([
-            sendToPopup('updateDataCallback', nextBusesData, popupPort),
+            sendToPopup('updateDataCallback', data, popupPort),
             sendToPopup('getLastAPICallTsCallback', lastStateSyncTs, popupPort)
           ])
         })
