@@ -12,7 +12,15 @@ Available schedules:
 
 #### How to add your bus/train/ferry API?
 
-1. TODO 
+That should be easy as hell.   
+All you need to do is just create new object here: `app/js/src/utils/cities.js`  
+With 3 necessary fields:   
+1. `url` -- a string with url endpoint to your API. Extension will make http GET request to endpoint once per minute (see `app/js/src/config.js`).   
+2. `paramsBuilder` -- a function that should build query object for API request from extension state object.   
+3. `responseHandler` -- a function that should handle API response: build object with new data about next buses, or with errors from API.  
+
+If you have any questions, please look at jsDoc in `app/js/src/utils/cities.js`.  
+Or just ask me ;)  
 
 #### Roadmap
 
@@ -33,18 +41,18 @@ Available schedules:
   * Licence  
   * add bus id input  
   * README.md  
+  * Contribute instructions for other cities
 </p></details>
 <details>
   <summary>Todo</summary><p>
-  * about page  
-  * Contribute instructions for other cities  
   * Try to follow "Contribute instructions for other cities" and add new api: NYC/... api  
+  * about page in Chrome Web Store    
   * tests. Hmm should start with them next time :)  
   * Google Analytics counter. (What is it for?)    
   * Add FF, Safari, etc.  
   * Add ability to add stops from map  
   * Add some static API  
-  * Add ability to add API privately  
+  * Add ability to add API privately (== locally)  
 </p></details>
 
 #### The Story

@@ -39,7 +39,7 @@ export const CITIES_API = {
    * https://data.gov.ie/dataset/real-time-passenger-information-rtpi-for-dublin-bus-bus-eireann-luas-and-irish-rail
    */
   DUB: {
-    iconsPrefix: 'dublin', // TODO should be also available in popup.js
+    iconsPrefix: 'dublin',
     url: 'https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation',
     paramsBuilder: source => {
       const params = {}
