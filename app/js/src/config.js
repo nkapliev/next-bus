@@ -13,7 +13,7 @@ export let config = {
   popupShowTimeout: 500, // ms
   i18n: {
     en: {
-      no_buses: 'No bus shortly',
+      no_buses: 'Nothing shortly',
       no_info: 'No info about stop',
       due: 'due'
     }

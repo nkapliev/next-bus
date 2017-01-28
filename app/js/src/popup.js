@@ -53,15 +53,16 @@ function buildNextBusElement (nextBusData) {
 
 /**
  * @param {String} stateName
+ * @param {Boolean} [hasDebounce=false]
  * @return {Function}
  */
-function getInputDebouncedHandler (stateName) {
+function getOnControlChange (stateName, hasDebounce=false) {
   let debounceTimeoutId
-  const handler = event => {
+  const onChange = event => {
     if (state[stateName] !== event.target.value) {
       state[stateName] = event.target.value
 
-      console.log(`${stateName} input changed to: ${state[stateName]}`)
+      console.log(`${stateName} changed to: ${state[stateName]}`)
 
       blocks.updateStatusLoader.setMod('visible', 'yes')
       sendToBackground('setState', {[stateName]: state[stateName]}, backgroundPort)
@@ -69,25 +70,15 @@ function getInputDebouncedHandler (stateName) {
   }
 
   return event => {
-    if (!event.target.value) {
-      handler(event)
-    } else {
+    if (hasDebounce && event.target.value) {
       debounceTimeoutId && clearTimeout(debounceTimeoutId)
       debounceTimeoutId = setTimeout(() => {
         debounceTimeoutId = null
-        handler(event)
+        onChange(event)
       }, config.inputDebounceTTL)
+    } else {
+      onChange(event)
     }
-  }
-}
-
-/**
- * @param {String} stateName
- * @return {Function}
- */
-function onSelectChange (stateName) {
-  return event => {
-    console.log(`select ${stateName} has been changed: ${event}`)
   }
 }
 
@@ -156,9 +147,9 @@ const callbacks = {
       blocks.scheduleMessage.setMod('visible', 'yes')
     } else {
       blocks.scheduleMessage.delMod('visible', 'yes')
-      data.nextBuses
-        .sort((busA, busB) => busA.leftMinutes - busB.leftMinutes)
-        .forEach(bus => blocks.scheduleTable.htmlElem.appendChild(buildNextBusElement(bus)))
+      data.nextBuses.forEach(bus => {
+        blocks.scheduleTable.htmlElem.appendChild(buildNextBusElement(bus))
+      })
     }
   },
   /**
@@ -223,13 +214,13 @@ document.addEventListener('DOMContentLoaded', function () {
   connectToBackground()
   restoreState()
 
-  blocks.apiSelect.htmlElem.addEventListener('change', onSelectChange('api-id'))
-  blocks.stopInput.htmlElem.addEventListener('input', getInputDebouncedHandler('stopId'))
-  blocks.routeInput.htmlElem.addEventListener('input', getInputDebouncedHandler('routeId'))
+  blocks.apiSelect.htmlElem.addEventListener('change', getOnControlChange('apiId'))
+  blocks.stopInput.htmlElem.addEventListener('input', getOnControlChange('stopId', true))
+  blocks.routeInput.htmlElem.addEventListener('input', getOnControlChange('routeId', true))
 
   // For some reason sometimes popup opens only as small square.
   setTimeout(() => {
     blocks.pageLoader.delMod('visible', 'yes')
     blocks.page.setMod('visible', 'yes')
-  }, config.popupShowTimeout)
+  }, config.popupShowTimeout) // TODO Dirty hack
 })

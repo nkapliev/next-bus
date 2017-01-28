@@ -38,13 +38,23 @@ const handlers = {
       // TODO I do not kno why 30 sec. Have any idea for better value?
       Number.isInteger(lastStateSyncTs) && lastStateSyncTs < (Date.now() - config.dataUpdateInterval / 2)
     ) {
-      const params = api.paramsBuilder({
-        stopId: state.stopId,
-        routeId: state.routeId
-      })
-
-      return makeAPIRequest(api.url, params)
+      return makeAPIRequest({
+          url: api.url,
+          method: api.method,
+          responseType: api.responseType,
+          params: api.paramsBuilder({
+            stopId: state.stopId,
+            routeId: state.routeId
+          })
+        })
         .then(api.responseHandler)
+        .then(data => {
+          if (Array.isArray(data.nextBuses)) {
+            data.nextBuses.sort((busA, busB) => busA.leftMinutes - busB.leftMinutes)
+          }
+
+          return data
+        })
     } else {
       return Promise.resolve(lastAPICheckData)
     }
@@ -127,6 +137,16 @@ const handlers = {
       api = APIs[apiId]
       state.apiId = apiId
       localStorage.setItem('api-id', apiId)
+
+      chrome.browserAction.setIcon({
+        path: {
+          16: `icons/${apiId}/16.png`,
+          24: `icons/${apiId}/24.png`,
+          32: `icons/${apiId}/32.png`,
+          48: `icons/${apiId}/48.png`,
+          128: `icons/${apiId}/128.png`
+        }
+      })
 
       isStateSync = false
     }

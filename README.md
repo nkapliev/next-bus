@@ -5,6 +5,7 @@ Next Bus is a Chrome Browser Extension that helps you to be in touch with your b
 
 Available schedules:  
 * **Dublin Buses**
+* **Irish Rails**
 * *[Add your favourite transport API. See [how-to](#how-to-add-your-bustrainferry-api)]*
 
 #### How it works?
@@ -12,14 +13,16 @@ Available schedules:
 
 #### How to add your bus/train/ferry API?
 
-That should be easy as hell.   
-All you need to do is just create new object here: `app/js/src/utils/cities.js`  
-With 3 necessary fields:   
-1. `url` -- a string with url endpoint to your API. Extension will make http GET request to endpoint once per minute (see `app/js/src/config.js`).   
-2. `paramsBuilder` -- a function that should build query object for API request from extension state object.   
-3. `responseHandler` -- a function that should handle API response: build object with new data about next buses, or with errors from API.  
+That should be easy as hell:
+1. Add your API host to `permissions` section in `app/manifest.json` for fix possible CORS issue  
+2. Create new API object at `app/js/src/utils/api.js`. With 3 necessary fields:
+  * `url` -- a string with url endpoint to your API. Extension will make http GET request to endpoint once per minute (see `app/js/src/config.js`).   
+  * `paramsBuilder` -- a function that should build query object for API request from extension state object.   
+  * `responseHandler` -- a function that should handle API response: build object with new data about next buses, or with errors from API.  
+3. Add icons for your API to `app/icons/`. Read more about icons at https://developer.chrome.com/apps/manifest/icons
 
-If you have any questions, please look at jsDoc in `app/js/src/utils/cities.js`.  
+If you have any questions, please look at jsDoc in `app/js/src/utils/api.js`.  
+Or you could look at [this]() commit where I've added new API for Irish Rails.  
 Or just ask me ;)  
 
 #### Roadmap
@@ -46,10 +49,13 @@ Or just ask me ;)
 </p></details>
 <details>
   <summary>Todo</summary><p>
+  * optimize gif and image in readme.md
   * about page in Chrome Web Store    
-  * github descriptions
-  * github pages?
+  * github descriptions  
+  * github pages?  
+  * Add tabs in popup to save several stops in several APIs. To compare time between buses and trains.
   * tests. Hmm should start with them next time :)  
+  * Add loglevels  
   * Google Analytics counter. (What is it for?)    
   * Add FF, Safari, etc.  
   * Add ability to add stops from map  

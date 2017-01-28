@@ -12,18 +12,30 @@ function queryBuilder (params) {
     : ''
 }
 
+// TODO Dirty bad hack
+let requestedRoute = null
+
 /**
  * Current request
  */
 let xhr
 
 /**
- * @param {String} url
- * @param {Object} [params]
- * @param {Function} [callback]
+ * @param {Object} options
+ *   @property {String} url
+ *   @property {String} [method='GET']
+ *   @property {String} [responseType='json']
+ *   @property {Object} [params]
+ *   @property {Function} [callback]
  * @return {Promise}
  */
-export function makeAPIRequest (url, params, callback) {
+export function makeAPIRequest (options) {
+  let url = options.url
+  let method = options.method || 'GET'
+  let responseType = options.responseType || 'json'
+  let params = options.params
+  let callback = options.callback
+
   cancelAPIRequest()
 
   xhr = new XMLHttpRequest()
@@ -35,16 +47,22 @@ export function makeAPIRequest (url, params, callback) {
 
     console.log(`Trying to make API request: ${url}`)
 
-    xhr.open('GET', url) // TODO What about POST|PUT|...?
-    xhr.responseType = 'json' // TODO What about other types?
+    xhr.open(method, url)
+    xhr.responseType = responseType
     xhr.onload = () => {
-      console.log('Get response from API:')
-      console.log(JSON.stringify(xhr.response, null, 4))
-      resolve(xhr.response)
-      callback && callback(null, xhr.response)
+      if (xhr.readyState === xhr.DONE) {
+        if (xhr.status === 200) {
+          console.log('Get response from API:')
+          console.log(responseType === 'json' ? JSON.stringify(xhr.response, null, 4) : xhr.response)
+
+          resolve(xhr.response)
+          callback && callback(null, xhr.response)
+        }
+      }
     }
     xhr.onerror = err => {
       console.log(`makeAPIRequest error: ${err}`)
+
       reject(err)
       callback && callback(err)
     }
@@ -65,6 +83,8 @@ export function cancelAPIRequest () {
 /** @typedef {Object} ApiDriver
  * @property {String} [iconPrefix=default]
  * @property {String} url
+ * @property {String} [responseType='json']
+ * @property {String} [method='GET']
  * @property {Function} paramsBuilder - Build API request params based on user data
  *   @param {Object} source
  *     @property {String} source.stopId
@@ -97,7 +117,7 @@ export const APIs = {
    * https://data.gov.ie/dataset/real-time-passenger-information-rtpi-for-dublin-bus-bus-eireann-luas-and-irish-rail
    */
   dublin_bus: {
-    iconsPrefix: 'dublin',
+    iconsPrefix: 'dublin', // TODO
     url: 'https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation',
     paramsBuilder: source => {
       const params = {}
@@ -136,11 +156,68 @@ export const APIs = {
 
       return result
     }
+  },
+  /**
+   * http://api.irishrail.ie/realtime/
+   */
+  irish_rail: {
+    iconsPrefix: 'dublin', // TODO
+    url: 'http://api.irishrail.ie/realtime/realtime.asmx/getStationDataByNameXML',
+    responseType: 'document',
+    paramsBuilder: source => {
+      // TODO Dirty bad hack
+      if (source.routeId) {
+        requestedRoute = String(source.routeId).toUpperCase()
+      } else {
+        requestedRoute = ''
+      }
+
+      return {
+        StationDesc: source.stopId
+      }
+    },
+    responseHandler: response => {
+      let result = {}
+
+      if (!response) {
+        result.error = {message: `Empty response from API: ${response}`}
+        console.log(result.error.message)
+      } else {
+        const DIRECTIONS_SHORTCUTS = {
+          Northbound: 'North',
+          Southbound: 'South'
+        }
+
+        result.nextBuses = Array.from(response.getElementsByTagName('objStationData'))
+          .filter(item => {
+            const directionNode = item.getElementsByTagName('Direction')[0]
+            const direction = directionNode ? directionNode.textContent : ''
+
+            // TODO String.prototype.startsWith() not working in old Chrome. Need to change babel env
+            return direction.toUpperCase().indexOf(requestedRoute) === 0
+          })
+          .map(item => {
+            const expectedDepartureNode = item.getElementsByTagName('Expdepart')[0]
+            const directionNode = item.getElementsByTagName('Direction')[0]
+            const dueInNode = item.getElementsByTagName('Duein')[0]
+
+            return {
+              departureTime: expectedDepartureNode ? expectedDepartureNode.textContent : '-',
+              leftMinutes: dueInNode && parseInt(dueInNode.textContent, 10) || 0,
+              routeId: directionNode
+                ? DIRECTIONS_SHORTCUTS[directionNode.textContent] || directionNode.textContent
+                : ''
+            }
+          })
+      }
+
+      return result
+    }
   }
   /* @see type ApiDriver
    your_api_id: {
    iconsPrefix: 'you-api-icon-prefix',
-   url: 'http://...'
+   url: 'http://...',
    paramsBuilder: function (source) {...},
    responseHandler = function (response) {...}
    }
