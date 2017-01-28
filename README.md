@@ -42,11 +42,13 @@ Or just ask me ;)
   * add bus id input  
   * README.md  
   * Contribute instructions for other cities
+  * Try to follow "Contribute instructions for other cities" and add new api: Dublin trains api  
 </p></details>
 <details>
   <summary>Todo</summary><p>
-  * Try to follow "Contribute instructions for other cities" and add new api: NYC/... api  
   * about page in Chrome Web Store    
+  * github descriptions
+  * github pages?
   * tests. Hmm should start with them next time :)  
   * Google Analytics counter. (What is it for?)    
   * Add FF, Safari, etc.  

@@ -82,26 +82,27 @@
             display: none;
         }
 
-        .stop-id-wrapper {
+        .control-wrapper {
             width: 175px;
+            margin-top: 3px;
+        }
+        .control-wrapper:first-child {
+            margin: 0;
+        }
+        .api-label {
+            margin-right: 6px;
         }
         .stop-label {
             margin-right: 7px;
         }
-        .stop-id-input {
+        .input {
             font-size: 1em;
-            width: 70px;
+            width: 107px;
             box-sizing: border-box;
         }
-
-        .route-id-wrapper {
-            width: 175px;
-            margin-top: 3px;
-        }
-        .route-id-input {
+        .select {
             font-size: 1em;
-            width: 70px;
-            box-sizing: border-box;
+            background-color: #fff;
         }
 
         .next-bus {
@@ -137,8 +138,8 @@
         }
         .update-status__loader {
             position: absolute;
-            top: 5px;
-            right: 8px;
+            top: 4px;
+            right: 0;
 
             display: none;
         }
@@ -150,13 +151,19 @@
 </head>
 <body>
 <div class="page">
-    <div class="stop-id-wrapper">
-        <label for="stop-id" class="stop-label">stop </label>
-        <input id="stop-id" type="text" class="stop-id-input" placeholder="e.g. 273" autofocus>
+    <div class="control-wrapper">
+        <label for="api-id" class="api-label">next </label>
+        <select name="api-id" id="api-id" class="api-id-select select">
+            <option value="dublin_bus">Dublin Bus</option>
+        </select>
     </div>
-    <div class="route-id-wrapper">
+    <div class="control-wrapper">
+        <label for="stop-id" class="stop-label">stop </label>
+        <input id="stop-id" type="text" class="stop-id-input input" placeholder="e.g. 273" autofocus>
+    </div>
+    <div class="control-wrapper">
         <label for="route-id" class="route-label">route </label>
-        <input id="route-id" type="text" class="route-id-input" placeholder="e.g. 7A" autofocus>
+        <input id="route-id" type="text" class="route-id-input input" placeholder="e.g. 7A">
     </div>
     <div class="schedule">
         <div class="schedule__table"></div>

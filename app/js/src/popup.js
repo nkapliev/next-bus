@@ -82,6 +82,16 @@ function getInputDebouncedHandler (stateName) {
 }
 
 /**
+ * @param {String} stateName
+ * @return {Function}
+ */
+function onSelectChange (stateName) {
+  return event => {
+    console.log(`select ${stateName} has been changed: ${event}`)
+  }
+}
+
+/**
  * Establish permanent connection to constantly worked background script
  */
 function connectToBackground () {
@@ -108,6 +118,7 @@ function connectToBackground () {
  * Restore last state
  */
 function restoreState () {
+  sendToBackground('getApi', null, backgroundPort)
   sendToBackground('getStop', null, backgroundPort)
   sendToBackground('getRoute', null, backgroundPort)
   sendToBackground('getLastAPICallTs', null, backgroundPort)
@@ -151,6 +162,16 @@ const callbacks = {
     }
   },
   /**
+   * @param {?String} initApiId
+   */
+  getApiCallback: initApiId => {
+    state.apiId = initApiId
+
+    if (state.apiId) {
+      blocks.apiSelect.htmlElem.value = state.apiId
+    }
+  },
+  /**
    * @param {?String} initStopId
    */
   getStopCallback: initStopId => {
@@ -189,9 +210,10 @@ document.addEventListener('DOMContentLoaded', function () {
     {name: 'lastUpdate', cssClass: 'update-status__last-update'},
     {name: 'scheduleMessage', cssClass: 'schedule__message'},
     {name: 'scheduleTable', cssClass: 'schedule__table'},
-    {name: 'pageLoader', cssClass: 'page__loader'},
     {name: 'routeInput', cssClass: 'route-id-input'},
     {name: 'stopInput', cssClass: 'stop-id-input'},
+    {name: 'apiSelect', cssClass: 'api-id-select'},
+    {name: 'pageLoader', cssClass: 'page__loader'},
     {name: 'error', cssClass: 'error'},
     {name: 'page', cssClass: 'page'},
   ].forEach(block => {
@@ -201,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
   connectToBackground()
   restoreState()
 
+  blocks.apiSelect.htmlElem.addEventListener('change', onSelectChange('api-id'))
   blocks.stopInput.htmlElem.addEventListener('input', getInputDebouncedHandler('stopId'))
   blocks.routeInput.htmlElem.addEventListener('input', getInputDebouncedHandler('routeId'))
 

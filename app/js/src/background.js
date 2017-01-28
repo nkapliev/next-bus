@@ -1,16 +1,14 @@
 'use strict'
 
-import {makeAPIRequest, cancelAPIRequest} from './utils/api'
-import {CITIES_API} from './utils/cities'
-import {config} from './config'
+import {makeAPIRequest, cancelAPIRequest, APIs} from './utils/api'
 import {send} from './utils/post-message'
+import {config} from './config'
 
 const sendToPopup = send.bind(null, 'background', 'popup')
 const i18n = config.i18n.en
 const colors = config.colors
 const state = {
-  // TODO 1. get cityId from select menu in interface and save to localstorage 2. Think about uniq ID
-  cityId: localStorage.getItem('city-id') || config.defaultCityId,
+  apiId: localStorage.getItem('api-id') || config.defaultApiId,
   stopId: localStorage.getItem('stop-id'),
   routeId: localStorage.getItem('route-id')
 }
@@ -18,7 +16,7 @@ const state = {
 let isStateSync = false
 let lastStateSyncTs
 let lastAPICheckData
-let api = CITIES_API[state.cityId]
+let api = APIs[state.apiId]
 let dataUpdateIntervalId
 let popupPort = null
 
@@ -52,7 +50,7 @@ const handlers = {
     }
   },
   /**
-   * Re-init city API interval checking
+   * Re-init API interval checking
    */
   updateData: (() => {
     const intervalCallback = () => {
@@ -117,18 +115,18 @@ const handlers = {
     chrome.browserAction.setBadgeBackgroundColor({color})
   },
   setState: newState => {
-    const cityId = newState.cityId
+    const apiId = newState.apiId
     const stopId = newState.stopId
     const routeId = newState.routeId
 
-    if (typeof cityId !== 'undefined' && cityId !== state.cityId) {
-      if (!CITIES_API[cityId]) {
-        throw new Error(`Background can't setCity, because there is no api for city '${cityId}'`)
+    if (typeof apiId !== 'undefined' && apiId !== state.apiId) {
+      if (!APIs[apiId]) {
+        throw new Error(`Background can't setApi, because there is no api for '${apiId}'`)
       }
 
-      api = CITIES_API[cityId]
-      state.cityId = cityId
-      localStorage.setItem('city-id', cityId)
+      api = APIs[apiId]
+      state.apiId = apiId
+      localStorage.setItem('api-id', apiId)
 
       isStateSync = false
     }
@@ -149,7 +147,7 @@ const handlers = {
 
     isStateSync || handlers.updateData()
   },
-  getCity: () => state.cityId,
+  getApi: () => state.apiId,
   getStop: () => state.stopId,
   getRoute: () => state.routeId,
   getLastAPICallTs: () => lastStateSyncTs

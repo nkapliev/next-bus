@@ -1,5 +1,5 @@
 export let config = {
-  defaultCityId: 'DUB',
+  defaultApiId: 'dublin_bus',
   colors: {
     ok: [0, 128, 0, 255],
     alarm: [192, 0, 0, 255],
