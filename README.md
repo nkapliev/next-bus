@@ -22,7 +22,7 @@ That should be easy as hell:
 3. Add icons for your API to `app/icons/`. Read more about icons at https://developer.chrome.com/apps/manifest/icons
 
 If you have any questions, please look at jsDoc in `app/js/src/utils/api.js`.  
-Or you could look at [this]() commit where I've added new API for Irish Rails.  
+Or you could look at [this](https://github.com/nkapliev/next-bus/commit/537771d3f6218cc9e8d54e4b3c2d3d859744e701) commit where I've added new API for Irish Rails.  
 Or just ask me ;)  
 
 #### Roadmap
