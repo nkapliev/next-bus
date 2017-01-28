@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "./node_modules/.bin/eslint app/js/src/",
     "build": "simplifyify app/js/src/popup.js app/js/src/background.js --outfile app/js/dist --bundle --minify --watch --debug",
+    "pack": "git tag | tail -1 | xargs -I{} zip -r next-bus-{}.zip app -x\\*.DS_Store",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "pre-commit": [

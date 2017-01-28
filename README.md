@@ -61,6 +61,8 @@ Or just ask me ;)
   * Add ability to add stops from map  
   * Add some static API  
   * Add ability to add API privately (== locally)  
+  * Add castomizable view for each API
+  * Add popup notifications
 </p></details>
 
 #### The Story
