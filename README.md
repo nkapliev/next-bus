@@ -46,10 +46,10 @@ Or just ask me ;)
   * README.md  
   * Contribute instructions for other cities
   * Try to follow "Contribute instructions for other cities" and add new api: Dublin trains api  
+  * optimize gif and image in readme.md  
 </p></details>
 <details>
   <summary>Todo</summary><p>
-  * optimize gif and image in readme.md
   * about page in Chrome Web Store    
   * github descriptions  
   * github pages?  
