@@ -48,10 +48,10 @@ Or just ask me ;)
   * Try to follow "Contribute instructions for other cities" and add new api: Dublin trains api  
   * optimize gif and image in readme.md
   * about page in Chrome Web Store    
+  * github descriptions  
 </p></details>
 <details>
   <summary>Todo</summary><p>
-  * github descriptions  
   * github pages?  
   * Add tabs in popup to save several stops in several APIs. To compare time between buses and trains.
   * tests. Hmm should start with them next time :)  
