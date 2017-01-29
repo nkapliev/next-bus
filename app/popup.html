@@ -85,6 +85,7 @@
         .control-wrapper {
             width: 186px;
             margin-top: 3px;
+            margin-right: 18px;
         }
         .control-wrapper:first-child {
             margin: 0;
@@ -146,11 +147,69 @@
         .update-status__loader_visible_yes {
             display: inline-block;
         }
+
+        .bookmark {
+            cursor: pointer;
+            width: 18px;
+            height: 27px;
+        }
+
+        .bookmark_color_white {
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAA+CAYAAABdhInWAAAByElEQVR42u2Zv0oDQRCHB5EYMIX2ihhfwDJBfIB0aYISG32GmE4rRV/B2hgrbWx8gYAW1hYBxVb8Q2yiEu50Rn5ChNxeLnd7d8FZ+JrLzsxX7M5uWCKiY+Yr5TQYehoDUXGkzhiIvqloXKKHzFJCHAQRrVFyo6aiKqqiKqqiKqqiKqqiKqqiKqqiKqqiKqqiKqqiKqqi/1h0hlll6swRqOPbbFpE15gu4wzI4+C39SRFp5km80n+rxoy5xQxsYrmmRYFf4ZpITYW0UUK9yz5jBxWRavMq4/IIzDNkRwbNkQnmR2f4g9MuS+mjG+mmF3kjkR0irk0FHOZe482JN/uMMcrXnJnw4rKwr/xaD2/NNFHTT22YYh3UCM/iug2s8K0fVqOvJlmhmg5Gcz9MORro2Yg0Qs0aq+k79hYQUcVsV55u6gdyTO4tJdCiLO8gBxW3+uvmYUILh6S48qGqCz4cws3pTOfjRpItIebUNaCaBYbtxdWVNbSFjNh8f4puTd9jmVPURfHYDHGC3MRNd0gorfMfAK3+znUHkr0hMkl+FckN+Ak+yMqJ80+pWfs9V3Kf0RfcCKULG+aUTZZCW7iSBVmmdI7xK3yDTgP+LQoB+GjAAAAAElFTkSuQmCC');
+            background-size: cover;
+        }
+        .bookmark_color_black {
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAA+CAYAAABdhInWAAABLElEQVR42u3aPU4CURiF4RMLQkEBvcQtUMIS6GhoqHQPuAJJ3AdKB+uAFdBhbI2SQKMS4sj5ki8aogT5uTMXc07yNmS48xSQKQAAuuwz8u4Ynk8AakbMTgA6F1RQQQUVVFBBBRVUUEEFFVRQQQUVVFBBBRVUUEEFFVRQQf8r9MmLFvrIGvhew1+LBpqwB1bCz9lrE78mc2iPFbF5Rf+9PTPogt2yHLYv59e+pw19Yy3svpa/NxXoC6ti/1X9jKDQEbvA4bMzhiGgH2yA46/vZx8FumTXLB8Aame2/R4HQe2zdMXOEG529uWWfwtthCb+GKwhvdX8nsku0DErI/2d+73/BL1nBWS3wi9PsjWoPWk6iGc3bvqCTtkrqwf+0uzzJau7zYxosgrindmaKzQAvlr7d1cyAAAAAElFTkSuQmCC');
+            background-size: cover;
+        }
+
+        .bookmark_type_add {
+            position: absolute;
+            top: -10px;
+            right: 24px;
+            opacity: 0.5;
+        }
+
+        .bookmark_type_add:hover {
+            opacity: 1;
+        }
+
+        .bookmark_type_add:after {
+            content: '+';
+            font-weight: bold;
+            position: absolute;
+            top: -1px;
+            left: 2px;
+            font-size: 1.1em;
+        }
+
+        .bookmark_type_total {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            opacity: 0.5;
+        }
+
+        .bookmark_type_total:hover {
+            opacity: 1;
+        }
+
+        .bookmark_type_total:after {
+            content: attr(data-content);
+            color: #fff;
+            position: absolute;
+            font-size: 0.9em;
+            top: 3px;
+            left: 4px;
+        }
     </style>
     <script src="js/dist/popup.js"></script>
 </head>
 <body>
 <div class="page">
+    <div class="bookmark bookmark_color_white bookmark_type_add"></div>
+    <div class="bookmark bookmark_color_black bookmark_type_total" data-content="2"></div>
+
     <div class="control-wrapper">
         <label for="api-id" class="api-label">next </label>
         <select name="api-id" id="api-id" class="api-id-select select">

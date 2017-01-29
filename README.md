@@ -22,7 +22,9 @@ That should be easy as hell:
   * `paramsBuilder` -- a function that should build query object for API request from extension state object.   
   * `responseHandler` -- a function that should handle API response: build object with new data about next buses, or with errors from API.    
 
-3. Add icons for your API to `app/icons/`. Read more about icons at https://developer.chrome.com/apps/manifest/icons
+3. Add select option for your API to `app/poppup.html`
+
+4. Add icons for your API to `app/icons/`. Read more about icons at https://developer.chrome.com/apps/manifest/icons
 
 If you have any questions, please look at jsDoc in `app/js/src/utils/api.js`.  
 Or you could look at [this](https://github.com/nkapliev/next-bus/commit/537771d3f6218cc9e8d54e4b3c2d3d859744e701) commit where I've added new API for Irish Rails.  
@@ -52,13 +54,13 @@ Or just ask me ;)
   * optimize gif and image in readme.md
   * about page in Chrome Web Store    
   * github descriptions  
+  - add bookmarks (aka presets)  
 </p></details>
 <details>
   <summary>Todo</summary><p>
   * draw big and large tiles for Chrome Web Store  
   * github pages?  
   * Think about universal non-ireland related icon. With commute theme.  
-  * Add tabs in popup to save several stops in several APIs. To compare time between buses and trains.
   * tests. Hmm should start with them next time :)  
   * Add loglevels  
   * Google Analytics counter. (What is it for?)    
