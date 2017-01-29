@@ -5,8 +5,9 @@
   "main": "app/js/dist/popup.js",
   "scripts": {
     "lint": "./node_modules/.bin/eslint app/js/src/",
-    "build": "simplifyify app/js/src/popup.js app/js/src/background.js --outfile app/js/dist --bundle --minify --watch --debug",
-    "pack": "git tag | tail -1 | xargs -I{} zip -r next-bus-{}.zip app -x\\*.DS_Store",
+    "buildify": "simplifyify app/js/src/popup.js app/js/src/background.js --outfile app/js/dist --bundle --minify --watch --debug",
+    "build": "simplifyify app/js/src/popup.js app/js/src/background.js --outfile app/js/dist --minify",
+    "pack": "npm run lint && npm run build && git tag | tail -1 | xargs -I{} zip -r next-bus-{}.zip app -x app/js/src/\\* \\*.min.js \\*.map \\*.gitignore \\*.DS_Store",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "pre-commit": [
