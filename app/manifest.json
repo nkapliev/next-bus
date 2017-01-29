@@ -3,7 +3,7 @@
   "name": "Next Bus",
   "version": "0.0.1",
 
-  "description": "Helps you to be in touch with your bus. Open source.",
+  "description": "Stay in touch with your next bus! And next train. Free and open-source.",
   "icons": {
     "16": "icons/dublin_bus/16.png",
     "24": "icons/dublin_bus/24.png",

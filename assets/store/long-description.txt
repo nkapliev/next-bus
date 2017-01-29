@@ -1,0 +1,27 @@
+Office.
+Evening.
+You are thinking about going home.
+But waiting for a bus at a bus stop is so annoying/chilly/wetly.
+Agree that read your favourite blog in cosy and warm office for another 7-10 minutes is a much better idea, isn't it?
+
+Now you can arrive at the bus stop just in time to catch the next bus.
+Welcome Amazing, Incredible and Outstanding!
+Chrome Browser Extension that will help you to be always in touch with your next bus:
+
+Next Bus
+
+Features:
+ • Real-time bus/train information for your favourite stop
+ • Ability to filter your favourite routes
+ • Minimalistic native interface
+ • Made with love
+
+Available transports:
+ • Dublin Buses
+ • Irish Rails
+
+You can add any bus/train/ferry API:
+Next Bus is an open-source project and welcome for any help.
+Look easy as hell how-to contribution guide at repository: https://github.com/nkapliev/next-bus
+
+Use Next Bus — Stay in touch with your next bus! And next train.

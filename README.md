@@ -9,7 +9,7 @@ Available schedules:
 * *[Add your favourite transport API. See [how-to](#how-to-add-your-bustrainferry-api)]*
 
 #### How it works?
-![Example of use](readme-assets/example.gif)
+![Example of use](assets/readme/example.gif)
 
 #### How to add your bus/train/ferry API?
 
@@ -46,11 +46,11 @@ Or just ask me ;)
   * README.md  
   * Contribute instructions for other cities
   * Try to follow "Contribute instructions for other cities" and add new api: Dublin trains api  
-  * optimize gif and image in readme.md  
+  * optimize gif and image in readme.md
+  * about page in Chrome Web Store    
 </p></details>
 <details>
   <summary>Todo</summary><p>
-  * about page in Chrome Web Store    
   * github descriptions  
   * github pages?  
   * Add tabs in popup to save several stops in several APIs. To compare time between buses and trains.
@@ -61,8 +61,10 @@ Or just ask me ;)
   * Add ability to add stops from map  
   * Add some static API  
   * Add ability to add API privately (== locally)  
-  * Add castomizable view for each API
-  * Add popup notifications
+  * Add castomizable view for each API  
+  * Add popup notifications  
+  * Inline install: https://developer.chrome.com/webstore/inline_installation?hl=en-US    
+  * Add youtube video of usage with cats, unicornes and nice music  
 </p></details>
 
 #### The Story
@@ -74,7 +76,7 @@ But if you don't want to miss your next bus, you should always have the schedule
 Also, you don't need all schedule; you need only the next bus, the one that will get you to home.  
 With all this assumptions, my ex-colleague, [@ortemij](https://github.com/ortemij), has created a browser extension [benua-helper](https://github.com/ortemij/benua-helper).  
 
-![Benua](readme-assets/benua.jpg)  
+![Benua](assets/readme/benua.jpg)  
 *Benua is a name of the office building in the middle of Saint Petersburg, Russia. It's gorgeous. It was named after Alexandre Benois, famous Russian artist. Look at his [paintings](https://www.wikiart.org/en/alexandre-benois).*  
 
 `benua-helper` was extremely helpful and all our office (700+ people) using it every day.  
@@ -91,7 +93,7 @@ Why I just didn't add some new functionality to `benua-helper`?
 
 #### Thank you, Nick!
 You're welcome!  
-![You're welcome!](readme-assets/youre-welcome.gif) 
+![You're welcome!](assets/readme/youre-welcome.gif) 
  
 Please, :star: this repo and rate [Next Bus Extension](TODO chrome extension shop link) in Chrome Web Store.  
 Welcome for issues and comments.  
