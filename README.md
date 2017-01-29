@@ -6,12 +6,12 @@ Next Bus is a Chrome Browser Extension that helps you to be in touch with your b
 Available schedules:  
 * **Dublin Buses**
 * **Irish Rails**
-* *[Add your favourite transport API. See [how-to](#how-to-add-your-bustrainferry-api)]*
+* *[Add your favourite transport API. See [how-to](#how-add-your-bustrainferry-api)]*
 
-#### How it works?
+#### How it works
 ![Example of use](assets/readme/example.gif)
 
-#### How to add your bus/train/ferry API?
+#### How add your bus/train/ferry API
 
 That should be easy as hell:  
 
