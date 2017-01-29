@@ -57,6 +57,7 @@ Or just ask me ;)
   <summary>Todo</summary><p>
   * draw big and large tiles for Chrome Web Store  
   * github pages?  
+  * Think about universal non-ireland related icon. With commute theme.  
   * Add tabs in popup to save several stops in several APIs. To compare time between buses and trains.
   * tests. Hmm should start with them next time :)  
   * Add loglevels  
@@ -99,6 +100,6 @@ Why I just didn't add some new functionality to `benua-helper`?
 You're welcome!  
 ![You're welcome!](assets/readme/youre-welcome.gif) 
  
-Please, :star: this repo and rate [Next Bus Extension](TODO chrome extension shop link) in Chrome Web Store.  
+Please, :star: this repo and rate [Next Bus Extension](https://chrome.google.com/webstore/detail/next-bus/gihhhhnhnlinalnmkdfjbecdjnoelpid) in Chrome Web Store.  
 Welcome for issues and comments.  
 And of course, add your transport APIs ;)
