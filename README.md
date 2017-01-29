@@ -13,12 +13,15 @@ Available schedules:
 
 #### How to add your bus/train/ferry API?
 
-That should be easy as hell:
+That should be easy as hell:  
+
 1. Add your API host to `permissions` section in `app/manifest.json` for fix possible CORS issue  
+
 2. Create new API object at `app/js/src/utils/api.js`. With 3 necessary fields:
   * `url` -- a string with url endpoint to your API. Extension will make http GET request to endpoint once per minute (see `app/js/src/config.js`).   
   * `paramsBuilder` -- a function that should build query object for API request from extension state object.   
-  * `responseHandler` -- a function that should handle API response: build object with new data about next buses, or with errors from API.  
+  * `responseHandler` -- a function that should handle API response: build object with new data about next buses, or with errors from API.    
+
 3. Add icons for your API to `app/icons/`. Read more about icons at https://developer.chrome.com/apps/manifest/icons
 
 If you have any questions, please look at jsDoc in `app/js/src/utils/api.js`.  
@@ -52,6 +55,7 @@ Or just ask me ;)
 </p></details>
 <details>
   <summary>Todo</summary><p>
+  * draw big and large tiles for Chrome Web Store  
   * github pages?  
   * Add tabs in popup to save several stops in several APIs. To compare time between buses and trains.
   * tests. Hmm should start with them next time :)  
