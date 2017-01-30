@@ -83,6 +83,21 @@ function getOnControlChange (stateName, hasDebounce=false) {
 }
 
 /**
+ * Favorite-total icon click handler
+ */
+function onFavoriteTotalClick () {
+  blocks.pageTypeMain.toggleMod('visible', 'yes')
+  blocks.pageTypeFavorite.toggleMod('visible', 'yes')
+}
+
+/**
+ * Favorite-current icon click handler
+ */
+function onFavoriteCurrentClick () {
+  sendToBackground('favoriteInfo', true, backgroundPort)
+}
+
+/**
  * Establish permanent connection to constantly worked background script
  */
 function connectToBackground () {
@@ -112,6 +127,7 @@ function restoreState () {
   sendToBackground('getApi', null, backgroundPort)
   sendToBackground('getStop', null, backgroundPort)
   sendToBackground('getRoute', null, backgroundPort)
+  sendToBackground('favoriteInfo', null, backgroundPort)
   sendToBackground('getLastAPICallTs', null, backgroundPort)
   sendToBackground('updateData', null, backgroundPort)
 }
@@ -183,6 +199,21 @@ const callbacks = {
     }
   },
   /**
+   * @param {Object} favoriteInfo
+   *  @property {Boolean} isCurrentFavorite
+   *  @property {Number} favorites
+   */
+  favoriteInfoCallback: favoriteInfo => {
+    state.isCurrentFavorite = favoriteInfo.isCurrentFavorite
+
+    blocks.favoriteCurrent.setMod('action', state.isCurrentFavorite ? 'del' : 'add')
+    blocks.favoriteCurrent.setMod('color', state.isCurrentFavorite ? 'black' : 'white')
+
+    blocks.favoriteTotal.htmlElem.dataset.content = String(favoriteInfo.favorites.length)
+
+    blocks.pageTypeFavorite.htmlElem.innerText = JSON.stringify(favoriteInfo.favorites)
+  },
+  /**
    * @param {?Number} lastAPICallTs
    */
   getLastAPICallTsCallback: lastAPICallTs => {
@@ -197,18 +228,28 @@ document.addEventListener('DOMContentLoaded', function () {
   [
     {name: 'lastUpdateLabel', cssClass: 'update-status__last-update-label'},
     {name: 'lastUpdateTime', cssClass: 'update-status__last-update-time'},
-    {name: 'updateStatusLoader', cssClass: 'update-status__loader'},
     {name: 'lastUpdate', cssClass: 'update-status__last-update'},
+    {name: 'pageTypeFavorite', cssClass: 'page_type_favorite'},
+    {name: 'favoriteTotal', cssClass: 'favorite_type_total'},
+    {name: 'favoriteCurrent', cssClass: 'favorite_type_current'},
     {name: 'scheduleMessage', cssClass: 'schedule__message'},
     {name: 'scheduleTable', cssClass: 'schedule__table'},
+    {name: 'pageTypeMain', cssClass: 'page_type_main'},
     {name: 'routeInput', cssClass: 'route-id-input'},
     {name: 'stopInput', cssClass: 'stop-id-input'},
     {name: 'apiSelect', cssClass: 'api-id-select'},
-    {name: 'pageLoader', cssClass: 'page__loader'},
     {name: 'error', cssClass: 'error'},
-    {name: 'page', cssClass: 'page'},
   ].forEach(block => {
     blocks[block.name] = Block.findBlockInDocument(block.cssClass)
+  });
+
+  [
+    {name: 'updateStatusLoader', hostCssClass: 'update-status__loader', cssClass: 'loader'},
+    {name: 'pageLoader', hostCssClass: 'page__loader', cssClass: 'loader'}
+  ].forEach(block => {
+    blocks[block.name] = Block.findBlockOn(
+      Block.findBlockInDocument(block.hostCssClass).htmlElem,
+      block.cssClass)
   })
 
   connectToBackground()
@@ -218,9 +259,14 @@ document.addEventListener('DOMContentLoaded', function () {
   blocks.stopInput.htmlElem.addEventListener('input', getOnControlChange('stopId', true))
   blocks.routeInput.htmlElem.addEventListener('input', getOnControlChange('routeId', true))
 
+  blocks.favoriteTotal.htmlElem.addEventListener('click', onFavoriteTotalClick)
+  blocks.favoriteCurrent.htmlElem.addEventListener('click', onFavoriteCurrentClick)
+
   // For some reason sometimes popup opens only as small square.
   setTimeout(() => {
     blocks.pageLoader.delMod('visible', 'yes')
-    blocks.page.setMod('visible', 'yes')
+    blocks.pageTypeMain.setMod('visible', 'yes')
+    blocks.favoriteCurrent.setMod('visible', 'yes')
+    blocks.favoriteTotal.setMod('visible', 'yes')
   }, config.popupShowTimeout) // TODO Dirty hack
 })

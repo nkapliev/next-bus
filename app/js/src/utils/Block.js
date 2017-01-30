@@ -26,8 +26,10 @@ export class Block {
    * @return {?Block}
    */
   static findBlockIn (htmlElemRoot, className) {
-    let htmlElem = htmlElemRoot.getElementsByClassName(className)[0]
-    return htmlElem ? new Block(htmlElem, className) : null
+    const htmlElem = htmlElemRoot.getElementsByClassName(className)[0]
+    const blockClassName = className.split('_')[0]
+
+    return htmlElem ? new Block(htmlElem, blockClassName) : null
   }
 
   /**
@@ -44,7 +46,9 @@ export class Block {
    * @return {?Block}
    */
   static findBlockOn (htmlElem, className) {
-    return htmlElem.classList.contains(className) ? new Block(htmlElem, className) : null
+    const blockClassName = className.split('_')[0]
+
+    return htmlElem.classList.contains(className) ? new Block(htmlElem, blockClassName) : null
   }
 
   /**
@@ -52,7 +56,36 @@ export class Block {
    * @param {String} modValue
    */
   setMod (modName, modValue) {
+    this.htmlElem.classList.forEach(cssClass => {
+      cssClass = cssClass.split('_')
+
+      /**
+       * block.setMod('type', 'aaa')
+       * If block already has cssClass block_type_bbb, we should remove it.
+       */
+      if (
+        cssClass[0] === this.className &&
+        cssClass[1] === modName &&
+        cssClass[2] &&
+        cssClass[2] !== modValue
+      ) {
+        this.delMod(cssClass[1], cssClass[2])
+      }
+    })
+
     this.htmlElem.classList.add(`${this.className}_${modName}_${modValue}`)
+  }
+
+  /**
+   * @param {String} modName
+   * @param {String} modValue
+   */
+  toggleMod (modName, modValue) {
+    if (this.hasMod(modName, modValue)) {
+      this.delMod(modName, modValue)
+    } else {
+      this.setMod(modName, modValue)
+    }
   }
 
   /**

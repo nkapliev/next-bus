@@ -58,6 +58,8 @@ Or just ask me ;)
 </p></details>
 <details>
   <summary>Todo</summary><p>
+  * Update extension icon when init (after ctrl + R)
+  * Change filter logic in Irish Rails: add filtering for train destination(North: Howth or Malahide?)
   * draw big and large tiles for Chrome Web Store  
   * github pages?  
   * Think about universal non-ireland related icon. With commute theme.  

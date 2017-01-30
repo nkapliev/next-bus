@@ -78,6 +78,8 @@ const handlers = {
           }
 
           return Promise.all([
+            // TODO Move outside handler:
+            // Handler do not need to know about logic with messages between popup and background
             sendToPopup('updateDataCallback', data, popupPort),
             sendToPopup('getLastAPICallTsCallback', lastStateSyncTs, popupPort)
           ])
@@ -165,8 +167,35 @@ const handlers = {
       isStateSync = false
     }
 
-    isStateSync || handlers.updateData()
+    if (!isStateSync) {
+      handlers.updateData()
+      sendToPopup('favoriteInfoCallback', handlers.favoriteInfo(), popupPort)
+    }
   },
+  favoriteInfo: (() => {
+    let rawFavorites = localStorage.getItem('favorites')
+    const favorites = JSON.parse(rawFavorites) || []
+
+    return needToUpdateFavorites => {
+      const rawState = JSON.stringify(state)
+      const index = favorites.indexOf(rawState)
+      let isCurrentFavorite = index !== -1
+
+      if (needToUpdateFavorites) {
+        if (isCurrentFavorite) {
+          favorites.splice(index, 1)
+        } else {
+          favorites.push(rawState)
+        }
+
+        isCurrentFavorite = !isCurrentFavorite
+        rawFavorites = JSON.stringify(favorites)
+        localStorage.setItem('favorites', rawFavorites)
+      }
+
+      return {isCurrentFavorite, favorites}
+    }
+  })(),
   getApi: () => state.apiId,
   getStop: () => state.stopId,
   getRoute: () => state.routeId,
