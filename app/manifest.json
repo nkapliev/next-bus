@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Next Bus",
-  "version": "0.0.2",
+  "version": "0.0.3",
 
   "description": "Stay in touch with your next bus! And next train. Free and open-source.",
   "icons": {
@@ -26,8 +26,7 @@
 
   "author": "Nikolai Kapliev nkapliev@gmail.com",
   "background": {
-    "scripts": ["js/dist/background.js"],
-    "persistent": false
+    "scripts": ["js/dist/background.js"]
   },
   "homepage_url": "https://github.com/nkapliev/next-bus",
   "offline_enabled": false,
