@@ -1,6 +1,6 @@
 {
   "name": "next-bus",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chrome browser extension helps always be in touch with your next bus",
   "main": "app/js/dist/popup.js",
   "scripts": {
