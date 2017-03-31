@@ -118,6 +118,7 @@ export const APIs = {
    */
   dublin_bus: {
     iconsPrefix: 'dublin', // TODO
+    name: 'Dublin Bus',
     url: 'https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation',
     paramsBuilder: source => {
       const params = {}
@@ -162,6 +163,7 @@ export const APIs = {
    */
   irish_rail: {
     iconsPrefix: 'dublin', // TODO
+    name: 'Irish Rail',
     url: 'http://api.irishrail.ie/realtime/realtime.asmx/getStationDataByNameXML',
     responseType: 'document',
     paramsBuilder: source => {

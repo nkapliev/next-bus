@@ -211,6 +211,27 @@
             top: 3px;
             left: 4px;
         }
+
+        .favorites-table {
+            display: table;
+        }
+        .favorite-state {
+            margin-top: 10px;
+        }
+        .favorite-state:first-child {
+            margin: 0;
+        }
+        .favorite-api-name,
+        .favorite-stop,
+        .favorite-route {
+            display: table-cell;
+            white-space: nowrap;
+            padding-right: 10px;
+        }
+        .favorite-route {
+            padding: 0;
+        }
+
     </style>
     <script src="js/dist/popup.js"></script>
 </head>
@@ -250,7 +271,7 @@
     </div>
 </div>
 <div class="page page_type_favorite">
-    page with favorites
+    <div class="favorites-table"></div>
 </div>
 <div class="page__loader loader_visible_yes loader"></div>
 </body>

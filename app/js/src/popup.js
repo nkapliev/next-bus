@@ -2,6 +2,7 @@
 // TODO debug mode console.log filter
 
 import {config} from './config'
+import {APIs} from './utils/api'
 import {Block} from './utils/Block'
 import {send} from './utils/post-message'
 
@@ -38,17 +39,34 @@ function createElement (className, inner, tagName='div') {
  * @return {HTMLElement}
  */
 function buildNextBusElement (nextBusData) {
-  let nextBusElem = createElement('next-bus')
-  let routeIdElem = createElement('next-bus__route-id', nextBusData.routeId)
-  let leftMinutes = createElement('next-bus__left-minutes',
+  const nextBusElem = createElement('next-bus')
+  const routeIdElem = createElement('next-bus__route-id', nextBusData.routeId)
+  const leftMinutes = createElement('next-bus__left-minutes',
     nextBusData.leftMinutes ? `${nextBusData.leftMinutes} min` : 'due')
-  let depTimeElem = createElement('next-bus__departure-time', nextBusData.departureTime)
+  const depTimeElem = createElement('next-bus__departure-time', nextBusData.departureTime)
 
   nextBusElem.appendChild(routeIdElem)
   nextBusElem.appendChild(leftMinutes)
   nextBusElem.appendChild(depTimeElem)
 
   return nextBusElem
+}
+
+/**
+ * @param {State} favorite
+ * @return {HTMLElement}
+ */
+function buildFavoriteElement (favorite) {
+  const favoriteElem = createElement('favorite-state')
+  const apiNameElem = createElement('favorite-api-name', APIs[favorite.apiId] ? APIs[favorite.apiId].name : '-')
+  const stopElem = createElement('favorite-stop', favorite.stopId)
+  const routeElem = createElement('favorite-route', favorite.routeId)
+
+  favoriteElem.appendChild(apiNameElem)
+  favoriteElem.appendChild(stopElem)
+  favoriteElem.appendChild(routeElem)
+
+  return favoriteElem
 }
 
 /**
@@ -211,7 +229,11 @@ const callbacks = {
 
     blocks.favoriteTotal.htmlElem.dataset.content = String(favoriteInfo.favorites.length)
 
-    blocks.pageTypeFavorite.htmlElem.innerText = JSON.stringify(favoriteInfo.favorites)
+    blocks.favoritesTable.htmlElem.innerText = ''
+
+    favoriteInfo.favorites.forEach(favorite => {
+      blocks.favoritesTable.htmlElem.appendChild(buildFavoriteElement(JSON.parse(favorite)))
+    })
   },
   /**
    * @param {?Number} lastAPICallTs
@@ -232,6 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
     {name: 'pageTypeFavorite', cssClass: 'page_type_favorite'},
     {name: 'favoriteTotal', cssClass: 'favorite_type_total'},
     {name: 'favoriteCurrent', cssClass: 'favorite_type_current'},
+    {name: 'favoritesTable', cssClass: 'favorites-table'},
     {name: 'scheduleMessage', cssClass: 'schedule__message'},
     {name: 'scheduleTable', cssClass: 'schedule__table'},
     {name: 'pageTypeMain', cssClass: 'page_type_main'},
