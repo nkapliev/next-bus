@@ -54,10 +54,12 @@ Or just ask me ;)
   * optimize gif and image in readme.md
   * about page in Chrome Web Store    
   * github descriptions  
-  - add bookmarks (aka presets, favorites)  
+  - add favorites  
 </p></details>
 <details>
   <summary>Todo</summary><p>
+  * move TODOs to issues in github
+  * Integrate react.js
   * Write fallback for API connection failing  
   * Update extension icon when init (after ctrl + R)
   * Change filter logic in Irish Rails: add filtering for train destination(North: Howth or Malahide?)

@@ -26,10 +26,13 @@ const blocks = {}
 function createElement (className, inner, tagName='div') {
   let elem = document.createElement(tagName)
 
-  if (typeof className !== 'undefined')
+  if (typeof className !== 'undefined') {
     elem.className = className
-  if (typeof inner !== 'undefined')
+  }
+
+  if (typeof inner !== 'undefined') {
     elem.innerHTML = inner
+  }
 
   return elem
 }
@@ -58,6 +61,7 @@ function buildNextBusElement (nextBusData) {
  */
 function buildFavoriteElement (favorite) {
   const favoriteElem = createElement('favorite-state')
+  const controlDel = createElement('favorite-control favorite-control_type_del', '&#10060;')
   const apiNameElem = createElement('favorite-api-name', APIs[favorite.apiId] ? APIs[favorite.apiId].name : '-')
   const stopElem = createElement('favorite-stop', favorite.stopId)
   const routeElem = createElement('favorite-route', favorite.routeId)
@@ -65,6 +69,7 @@ function buildFavoriteElement (favorite) {
   favoriteElem.appendChild(apiNameElem)
   favoriteElem.appendChild(stopElem)
   favoriteElem.appendChild(routeElem)
+  favoriteElem.appendChild(controlDel)
 
   return favoriteElem
 }
