@@ -176,24 +176,31 @@ const handlers = {
     let rawFavorites = localStorage.getItem('favorites')
     const favorites = JSON.parse(rawFavorites) || []
 
-    return needToUpdateFavorites => {
-      const rawState = JSON.stringify(state)
-      const index = favorites.indexOf(rawState)
-      let isCurrentFavorite = index !== -1
+    return favoriteInfo => {
+      favoriteInfo || (favoriteInfo = {})
 
-      if (needToUpdateFavorites) {
-        if (isCurrentFavorite) {
-          favorites.splice(index, 1)
+      const rawCurrentState = JSON.stringify(state)
+      const rawState = favoriteInfo.rawState || rawCurrentState
+      const stateIndexInFavorites = favorites.indexOf(rawState)
+      const isStateInFavorites = stateIndexInFavorites !== -1
+      const result = {favorites}
+
+      if (favoriteInfo.needToUpdateFavorites) {
+        if (isStateInFavorites) {
+          favorites.splice(stateIndexInFavorites, 1)
         } else {
           favorites.push(rawState)
         }
 
-        isCurrentFavorite = !isCurrentFavorite
         rawFavorites = JSON.stringify(favorites)
         localStorage.setItem('favorites', rawFavorites)
+
+        result.isCurrentFavorite = rawState === rawCurrentState ? !isStateInFavorites : false
+      } else {
+        result.isCurrentFavorite = isStateInFavorites
       }
 
-      return {isCurrentFavorite, favorites}
+      return result
     }
   })(),
   getApi: () => state.apiId,

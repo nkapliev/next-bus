@@ -71,7 +71,24 @@ function buildFavoriteElement (favorite) {
   favoriteElem.appendChild(routeElem)
   favoriteElem.appendChild(controlDel)
 
+  controlDel.dataset.state = JSON.stringify(favorite)
+
+  controlDel.addEventListener('click', onFavoriteControlDelClick)
+
   return favoriteElem
+}
+
+/**
+ * @param {Event} event
+ */
+function onFavoriteControlDelClick (event) {
+  const favoriteTableRow = event.target
+
+  sendToBackground('favoriteInfo',
+    {rawState: favoriteTableRow.dataset.state, needToUpdateFavorites: true},
+    backgroundPort)
+
+  favoriteTableRow.parentNode.removeChild(favoriteTableRow)
 }
 
 /**
@@ -117,7 +134,7 @@ function onFavoriteTotalClick () {
  * Favorite-current icon click handler
  */
 function onFavoriteCurrentClick () {
-  sendToBackground('favoriteInfo', true, backgroundPort)
+  sendToBackground('favoriteInfo', {needToUpdateFavorites: true}, backgroundPort)
 }
 
 /**
@@ -232,13 +249,23 @@ const callbacks = {
     blocks.favoriteCurrent.setMod('action', state.isCurrentFavorite ? 'del' : 'add')
     blocks.favoriteCurrent.setMod('color', state.isCurrentFavorite ? 'black' : 'white')
 
-    blocks.favoriteTotal.htmlElem.dataset.content = String(favoriteInfo.favorites.length)
-
     blocks.favoritesTable.htmlElem.innerText = ''
 
-    favoriteInfo.favorites.forEach(favorite => {
-      blocks.favoritesTable.htmlElem.appendChild(buildFavoriteElement(JSON.parse(favorite)))
-    })
+    if (favoriteInfo.favorites.length > 0) {
+      blocks.favoriteTotal.htmlElem.dataset.content = String(favoriteInfo.favorites.length)
+      blocks.favoriteTotal.setMod('visible', 'yes')
+
+      favoriteInfo.favorites.forEach(favorite => {
+        blocks.favoritesTable.htmlElem.appendChild(buildFavoriteElement(JSON.parse(favorite)))
+      })
+    } else {
+      if (blocks.pageTypeFavorite.hasMod('visible', 'yes')) {
+        blocks.pageTypeMain.toggleMod('visible', 'yes')
+        blocks.pageTypeFavorite.toggleMod('visible', 'yes')
+      }
+
+      blocks.favoriteTotal.delMod('visible', 'yes')
+    }
   },
   /**
    * @param {?Number} lastAPICallTs
@@ -295,6 +322,6 @@ document.addEventListener('DOMContentLoaded', function () {
     blocks.pageLoader.delMod('visible', 'yes')
     blocks.pageTypeMain.setMod('visible', 'yes')
     blocks.favoriteCurrent.setMod('visible', 'yes')
-    blocks.favoriteTotal.setMod('visible', 'yes')
+    // blocks.favoriteTotal.setMod('visible', 'yes')
   }, config.popupShowTimeout) // TODO Dirty hack
 })
