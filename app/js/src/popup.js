@@ -9,7 +9,21 @@ import {send} from './utils/post-message'
 const sendToBackground = send.bind(null, 'popup', 'background')
 const i18n = config.i18n.en
 let backgroundPort = null
+
+/**
+ * @type {State}
+ */
 let state = {}
+
+/**
+ * Map from state name to html element name
+ * @type {{apiId, stopId, routeId}}
+ */
+const controlByStateName = {
+  apiId: 'apiSelect',
+  stopId: 'stopInput',
+  routeId: 'routeInput'
+}
 
 /**
  * Hash with popup blocks
@@ -56,39 +70,78 @@ function buildNextBusElement (nextBusData) {
 }
 
 /**
+ * @param {State} state1
+ * @param {State} state2
+ * @return {Boolean}
+ */
+function isStatesEqual (state1, state2) {
+  const keys1 = Object.keys(state1)
+  const keys2 = Object.keys(state2)
+
+  return keys1.length === keys2.length &&
+      keys1.every(key1 => state1[key1] === state2[key1])
+}
+
+/**
  * @param {State} favorite
  * @return {HTMLElement}
  */
 function buildFavoriteElement (favorite) {
-  const favoriteElem = createElement('favorite-state')
-  const controlDel = createElement('favorite-control favorite-control_type_del', '&#10060;')
+  const favoriteElemClass = `favorite-state ${isStatesEqual(state, favorite) ? 'favorite-state_current_yes' : ''}`
+  const favoriteElem = createElement(favoriteElemClass)
   const apiNameElem = createElement('favorite-api-name', APIs[favorite.apiId] ? APIs[favorite.apiId].name : '-')
   const stopElem = createElement('favorite-stop', favorite.stopId)
   const routeElem = createElement('favorite-route', favorite.routeId)
+  const controlDel = createElement('favorite-control favorite-control_type_del')
+
+  apiNameElem.setAttribute('title', 'Click to use this filters')
+  stopElem.setAttribute('title', 'Click to use this filters')
+  routeElem.setAttribute('title', 'Click to use this filters')
+  controlDel.setAttribute('title', 'Remove')
 
   favoriteElem.appendChild(apiNameElem)
   favoriteElem.appendChild(stopElem)
   favoriteElem.appendChild(routeElem)
   favoriteElem.appendChild(controlDel)
 
-  controlDel.dataset.state = JSON.stringify(favorite)
+  favoriteElem.dataset.state = JSON.stringify(favorite)
 
-  controlDel.addEventListener('click', onFavoriteControlDelClick)
+  favoriteElem.addEventListener('click', onFavoriteRowClick)
+  controlDel.addEventListener('click', onFavoriteRowDelClick)
 
   return favoriteElem
 }
 
 /**
+ * @this {HTMLElement}
  * @param {Event} event
  */
-function onFavoriteControlDelClick (event) {
-  const favoriteTableRow = event.target
+function onFavoriteRowDelClick (event) {
+  const favoriteDelIcon = this
+  const favoriteTableRow = favoriteDelIcon.parentNode
+  const favoriteTable = favoriteTableRow.parentNode
+  const msgParams = {rawState: favoriteTableRow.dataset.state, needToUpdateFavorites: true}
 
-  sendToBackground('favoriteInfo',
-    {rawState: favoriteTableRow.dataset.state, needToUpdateFavorites: true},
-    backgroundPort)
+  sendToBackground('favoriteInfo', msgParams, backgroundPort)
 
-  favoriteTableRow.parentNode.removeChild(favoriteTableRow)
+  favoriteTable.removeChild(favoriteTableRow)
+
+  event.stopPropagation()
+}
+
+/**
+ * @this {HTMLElement}
+ * @param {Event} event
+ */
+function onFavoriteRowClick (event) {
+  const favoriteTableRow = this
+
+  sendToBackground('setState', JSON.parse(favoriteTableRow.dataset.state), backgroundPort)
+
+  blocks.pageTypeMain.toggleMod('visible', 'yes')
+  blocks.pageTypeFavorite.toggleMod('visible', 'yes')
+
+  event.stopPropagation()
 }
 
 /**
@@ -176,6 +229,24 @@ function restoreState () {
  * Hash with callbacks for background requests
  */
 const callbacks = {
+  setStateCallback: newState => {
+    Object.keys(newState).forEach(stateName => {
+      const controlName = controlByStateName[stateName]
+      const control = blocks[controlName]
+
+      if (!control) {
+        console.log(`setStateCallback: don't now that control: ${controlName}`)
+      } else if (state[stateName] !== newState[stateName]) {
+        state[stateName] = newState[stateName]
+
+        console.log(`setStateCallback: ${stateName} changed to: ${state[stateName]}`)
+
+        control.htmlElem.value = state[stateName] || ''
+
+        blocks.updateStatusLoader.setMod('visible', 'yes')
+      }
+    })
+  },
   /**
    * @param {APIHandledData} data
    */
@@ -244,27 +315,20 @@ const callbacks = {
    *  @property {Number} favorites
    */
   favoriteInfoCallback: favoriteInfo => {
-    state.isCurrentFavorite = favoriteInfo.isCurrentFavorite
-
-    blocks.favoriteCurrent.setMod('action', state.isCurrentFavorite ? 'del' : 'add')
-    blocks.favoriteCurrent.setMod('color', state.isCurrentFavorite ? 'black' : 'white')
+    blocks.favoriteCurrent.setMod('action', favoriteInfo.isCurrentFavorite ? 'del' : 'add')
+    blocks.favoriteCurrent.setMod('color', favoriteInfo.isCurrentFavorite ? 'black' : 'white')
 
     blocks.favoritesTable.htmlElem.innerText = ''
 
     if (favoriteInfo.favorites.length > 0) {
       blocks.favoriteTotal.htmlElem.dataset.content = String(favoriteInfo.favorites.length)
-      blocks.favoriteTotal.setMod('visible', 'yes')
 
       favoriteInfo.favorites.forEach(favorite => {
         blocks.favoritesTable.htmlElem.appendChild(buildFavoriteElement(JSON.parse(favorite)))
       })
-    } else {
-      if (blocks.pageTypeFavorite.hasMod('visible', 'yes')) {
-        blocks.pageTypeMain.toggleMod('visible', 'yes')
-        blocks.pageTypeFavorite.toggleMod('visible', 'yes')
-      }
-
-      blocks.favoriteTotal.delMod('visible', 'yes')
+    } else if (blocks.pageTypeFavorite.hasMod('visible', 'yes')) {
+      blocks.pageTypeMain.toggleMod('visible', 'yes')
+      blocks.pageTypeFavorite.toggleMod('visible', 'yes')
     }
   },
   /**
@@ -322,6 +386,6 @@ document.addEventListener('DOMContentLoaded', function () {
     blocks.pageLoader.delMod('visible', 'yes')
     blocks.pageTypeMain.setMod('visible', 'yes')
     blocks.favoriteCurrent.setMod('visible', 'yes')
-    // blocks.favoriteTotal.setMod('visible', 'yes')
+    blocks.favoriteTotal.setMod('visible', 'yes')
   }, config.popupShowTimeout) // TODO Dirty hack
 })

@@ -60,6 +60,7 @@ Or just ask me ;)
   <summary>Todo</summary><p>
   * move TODOs to issues in github
   * Integrate react.js
+  * Add weather at the top line: "+27 <sun icon>"
   * Write fallback for API connection failing  
   * Update extension icon when init (after ctrl + R)
   * Change filter logic in Irish Rails: add filtering for train destination(North: Howth or Malahide?)

@@ -171,6 +171,8 @@ const handlers = {
       handlers.updateData()
       sendToPopup('favoriteInfoCallback', handlers.favoriteInfo(), popupPort)
     }
+
+    return state
   },
   favoriteInfo: (() => {
     let rawFavorites = localStorage.getItem('favorites')

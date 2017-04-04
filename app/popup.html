@@ -219,41 +219,44 @@
             margin-right: -8px;
         }
         .favorite-state {
-            position: relative;
-            padding: 5px 20px 5px 10px;
+            display: table-row;
             cursor: pointer;
         }
-        .favorite-state:hover {
+
+        .favorites-table .favorite-state.favorite-state_current_yes {
             background: rgb(255, 219, 76);
         }
-        .favorite-state:hover .favorite-control {
-            visibility: visible;
+
+        .favorite-state:hover {
+            background: rgba(255, 219, 76, 0.3);
+        }
+
+        .favorite-state:hover .favorite-control_type_del:after {
+            content: '\274C';
+            position: absolute;
+            right: 10px;
         }
 
         .favorite-api-name,
         .favorite-stop,
-        .favorite-route {
+        .favorite-route,
+        .favorite-control {
             display: table-cell;
             white-space: nowrap;
-            padding-right: 10px;
+            padding: 5px 10px 5px 0;
         }
+
         .favorite-route {
-            padding: 0;
+            padding-right: 20px;
         }
 
-        .favorite-control {
-            position: absolute;
-            top: 3px;
-            right: 9px;
-            visibility: hidden;
-            cursor: pointer;
-            font-size: 0.8em;
+        .favorite-api-name {
+            padding-left: 10px;
         }
 
-        .favorite-control_type_del:hover {
-            font-size: 1em;
-            right: 7px;
-            top: 1px;
+        .favorite-control_type_del {
+            font-size: 0.6em;
+            position: relative;
         }
 
     </style>
