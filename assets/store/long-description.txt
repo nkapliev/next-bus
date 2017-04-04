@@ -1,8 +1,8 @@
-Office.
+Imagine your office.
 Evening.
 You are thinking about going home.
 But waiting for a bus at a bus stop is so annoying/chilly/wetly.
-Agree that read your favourite blog in cosy and warm office for another 7-10 minutes is a much better idea, isn't it?
+Reading your favourite blog in cosy chair at warm office for another 7-10 minutes is a much better idea, isn't it?
 
 Now you can arrive at the bus stop just in time to catch the next bus.
 Welcome Amazing, Incredible and Outstanding!
@@ -13,6 +13,7 @@ Next Bus
 Features:
  • Real-time bus/train information for your stop
  • Ability to filter your favourite routes
+ • Favorite bookmarks
  • Minimalistic native interface
  • Made with love 🖤
 
