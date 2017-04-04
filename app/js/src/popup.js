@@ -322,13 +322,19 @@ const callbacks = {
 
     if (favoriteInfo.favorites.length > 0) {
       blocks.favoriteTotal.htmlElem.dataset.content = String(favoriteInfo.favorites.length)
+      blocks.favoriteTotal.delMod('empty', 'yes')
 
       favoriteInfo.favorites.forEach(favorite => {
         blocks.favoritesTable.htmlElem.appendChild(buildFavoriteElement(JSON.parse(favorite)))
       })
-    } else if (blocks.pageTypeFavorite.hasMod('visible', 'yes')) {
-      blocks.pageTypeMain.toggleMod('visible', 'yes')
-      blocks.pageTypeFavorite.toggleMod('visible', 'yes')
+    } else {
+      blocks.favoriteTotal.htmlElem.dataset.content = 0
+      blocks.favoriteTotal.setMod('empty', 'yes')
+
+      if (blocks.pageTypeFavorite.hasMod('visible', 'yes')) {
+        blocks.pageTypeMain.toggleMod('visible', 'yes')
+        blocks.pageTypeFavorite.toggleMod('visible', 'yes')
+      }
     }
   },
   /**
