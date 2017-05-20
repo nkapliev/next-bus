@@ -82,21 +82,31 @@ function isStatesEqual (state1, state2) {
       keys1.every(key1 => state1[key1] === state2[key1])
 }
 
+const favoriteStories = [
+  'I bet you like this route!',
+  'This is one of your favorite routes.',
+  'Nice choice ;)'
+]
+
 /**
  * @param {State} favorite
+ * @param {Boolean} isCurrent
  * @return {HTMLElement}
  */
-function buildFavoriteElement (favorite) {
-  const favoriteElemClass = `favorite-state ${isStatesEqual(state, favorite) ? 'favorite-state_current_yes' : ''}`
+function buildFavoriteElement (favorite, isCurrent) {
+  const favoriteElemClass = `favorite-state ${isCurrent ? 'favorite-state_current_yes' : ''}`
   const favoriteElem = createElement(favoriteElemClass)
   const apiNameElem = createElement('favorite-api-name', APIs[favorite.apiId] ? APIs[favorite.apiId].name : '-')
   const stopElem = createElement('favorite-stop', favorite.stopId)
   const routeElem = createElement('favorite-route', favorite.routeId)
   const controlDel = createElement('favorite-control favorite-control_type_del')
 
-  apiNameElem.setAttribute('title', 'Click to use this filters')
-  stopElem.setAttribute('title', 'Click to use this filters')
-  routeElem.setAttribute('title', 'Click to use this filters')
+  const storyIndex = Math.floor(Math.random() * favoriteStories.length)
+  const story = favoriteStories[storyIndex]
+
+  apiNameElem.setAttribute('title', story)
+  stopElem.setAttribute('title', story)
+  routeElem.setAttribute('title', story)
   controlDel.setAttribute('title', 'Remove')
 
   favoriteElem.appendChild(apiNameElem)
@@ -327,8 +337,10 @@ const callbacks = {
       blocks.favoriteTotal.htmlElem.dataset.content = String(favoriteInfo.favorites.length)
       blocks.favoriteTotal.delMod('empty', 'yes')
 
-      favoriteInfo.favorites.forEach(favorite => {
-        blocks.favoritesTable.htmlElem.appendChild(buildFavoriteElement(JSON.parse(favorite)))
+      favoriteInfo.favorites.forEach(rawFavorite => {
+        const parsedFavorite = JSON.parse(rawFavorite)
+        blocks.favoritesTable.htmlElem.appendChild(
+          buildFavoriteElement(parsedFavorite, isStatesEqual(favoriteInfo.state, parsedFavorite)))
       })
     } else {
       blocks.favoriteTotal.htmlElem.dataset.content = 0

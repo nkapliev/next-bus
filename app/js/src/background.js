@@ -197,10 +197,14 @@ const handlers = {
         rawFavorites = JSON.stringify(favorites)
         localStorage.setItem('favorites', rawFavorites)
 
-        result.isCurrentFavorite = rawState === rawCurrentState ? !isStateInFavorites : false
+        result.isCurrentFavorite = rawState === rawCurrentState ? !isStateInFavorites : isStateInFavorites
       } else {
         result.isCurrentFavorite = isStateInFavorites
       }
+
+      // Need to return state as well, because `popup.js:favoriteInfoCallback`
+      // will be called before popup.js:state will be changed.
+      result.state = state
 
       return result
     }
