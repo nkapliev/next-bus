@@ -315,8 +315,11 @@ const callbacks = {
    *  @property {Number} favorites
    */
   favoriteInfoCallback: favoriteInfo => {
-    blocks.favoriteCurrent.setMod('action', favoriteInfo.isCurrentFavorite ? 'del' : 'add')
-    blocks.favoriteCurrent.setMod('color', favoriteInfo.isCurrentFavorite ? 'black' : 'white')
+    if (favoriteInfo.isCurrentFavorite) {
+      blocks.favoriteCurrent.delMod('visible', 'yes')
+    } else {
+      blocks.favoriteCurrent.setMod('visible', 'yes')
+    }
 
     blocks.favoritesTable.htmlElem.innerText = ''
 

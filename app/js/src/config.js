@@ -10,7 +10,7 @@ export let config = {
   alarmStartTime: 5, // minutes
   nextBusListSize: 10,
   inputDebounceTTL: 300, // ms
-  popupShowTimeout: 500, // ms
+  popupShowTimeout: 0, // ms
   i18n: {
     en: {
       no_buses: 'Nothing shortly',
