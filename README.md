@@ -54,11 +54,12 @@ Or just ask me ;)
   * optimize gif and image in readme.md
   * about page in Chrome Web Store    
   * github descriptions  
-  - add favorites  
+  * add favorites  
 </p></details>
 <details>
   <summary>Todo</summary><p>
   * move TODOs to issues in github
+  * renew app screenshots in store and video in repo
   * Integrate react.js
   * Add weather at the top line: "+27 <sun icon>"
   * Write fallback for API connection failing  

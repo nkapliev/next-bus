@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Next Bus",
-  "version": "0.0.3",
+  "version": "0.0.4",
 
   "description": "Stay in touch with your next bus! And next train. Free and open-source.",
   "icons": {
