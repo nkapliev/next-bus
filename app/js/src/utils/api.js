@@ -51,17 +51,24 @@ export function makeAPIRequest (options) {
     xhr.responseType = responseType
     xhr.onload = () => {
       if (xhr.readyState === xhr.DONE) {
+        console.log('Get response from API:')
         if (xhr.status === 200) {
-          console.log('Get response from API:')
+          console.log('HTTP status 200')
           console.log(responseType === 'json' ? JSON.stringify(xhr.response, null, 4) : xhr.response)
 
           resolve(xhr.response)
           callback && callback(null, xhr.response)
+        } else {
+          console.log(`HTTP status ${xhr.status}. I'll consider that as an error.`)
+          console.log(responseType === 'json' ? JSON.stringify(xhr.response, null, 4) : xhr.response)
+
+          reject(xhr.response)
+          callback && callback(xhr.response)
         }
       }
     }
     xhr.onerror = err => {
-      console.log(`makeAPIRequest error: ${err}`)
+      console.log(`makeAPIRequest network error: ${err}`)
 
       reject(err)
       callback && callback(err)
